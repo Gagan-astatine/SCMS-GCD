@@ -1,0 +1,42 @@
+import React from 'react';
+import { NavLink } from 'react-router-dom';
+
+const Sidebar = () => {
+  return (
+    <div className="sidebar">
+      <div className="sidebar-header">
+        <h2>SCMS</h2>
+        <p>Logistics Control</p>
+      </div>
+
+      <nav className="sidebar-nav">
+        <NavLink to="/" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
+          <div className="nav-icon">🏠</div>
+          <span>Home</span>
+        </NavLink>
+        <NavLink to="/analytics" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
+          <div className="nav-icon"></div>
+          <span>Analytics</span>
+        </NavLink>
+        <NavLink to="/map" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
+          <div className="nav-icon"></div>
+          <span>Map View</span>
+        </NavLink>
+        <NavLink to="/drivers" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
+          <div className="nav-icon">👥</div>
+          <span>Drivers</span>
+        </NavLink>
+        <NavLink to="/vehicles" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
+          <div className="nav-icon"></div>
+          <span>Vehicles</span>
+        </NavLink>
+        <NavLink to="/settings" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
+          <div className="nav-icon"></div>
+          <span>Settings</span>
+        </NavLink>
+      </nav>
+    </div>
+  );
+};
+
+export default Sidebar;
