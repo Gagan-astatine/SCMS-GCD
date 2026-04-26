@@ -23,23 +23,33 @@ const Auth = () => {
       })
       if (error) setError(error.message)
     } else {
+
+      // ✅ ADD HERE (inside else block)
+      const roleMap = {
+        seller: "owner",
+        buyer: "buyer",
+        driver: "driver"
+      };
+
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
-            role: role
+            role: roleMap[role]   // ✅ FIXED
           }
         }
       })
+
       if (error) {
         setError(error.message)
       } else {
-        setMessage('Registration successful! Please log in now or confirm your email if required.')
+        setMessage('Registration successful!')
         setIsLogin(true)
         setPassword('')
       }
     }
+
     setLoading(false)
   }
 
@@ -60,9 +70,9 @@ const Auth = () => {
           {!isLogin && (
             <div className="input-group">
               <label htmlFor="role">I am a...</label>
-              <select 
-                id="role" 
-                value={role} 
+              <select
+                id="role"
+                value={role}
                 onChange={(e) => setRole(e.target.value)}
                 style={{ padding: '12px 16px', borderRadius: '10px', border: '1px solid #cbd5e1', outline: 'none' }}
               >
@@ -84,7 +94,7 @@ const Auth = () => {
               required
             />
           </div>
-          
+
           <div className="input-group">
             <label htmlFor="password">Password</label>
             <input

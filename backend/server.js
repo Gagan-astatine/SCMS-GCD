@@ -4,6 +4,14 @@ const cors = require("cors");
 const crypto = require("crypto");
 require("dotenv").config();
 
+// ✅ ADD THIS (Supabase)
+const { createClient } = require("@supabase/supabase-js");
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY // IMPORTANT
+);
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -14,47 +22,68 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
-// ✅ Create Order
+// ✅ CREATE ORDER
 app.post("/api/payment/create-order", async (req, res) => {
   try {
     const { amount } = req.body;
 
-    const options = {
+    const order = await razorpay.orders.create({
       amount: amount * 100,
       currency: "INR",
       receipt: "receipt_" + Date.now(),
-    };
+    });
 
-    const order = await razorpay.orders.create(options);
     res.json(order);
   } catch (err) {
-    console.error(err);
+    console.error("CREATE ORDER ERROR:", err);
     res.status(500).send("Error creating order");
   }
 });
 
-// ✅ Verify Payment
-app.post("/api/payment/verify", (req, res) => {
-  const {
-    razorpay_order_id,
-    razorpay_payment_id,
-    razorpay_signature,
-  } = req.body;
+// ✅ VERIFY PAYMENT
+app.post("/api/payment/verify", async (req, res) => {
+  try {
+    const {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+      user_id,
+      amount
+    } = req.body;
 
-  const body = razorpay_order_id + "|" + razorpay_payment_id;
+    // 🔥 STEP 1: VERIFY SIGNATURE
+    const generated_signature = crypto
+      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+      .update(razorpay_order_id + "|" + razorpay_payment_id)
+      .digest("hex");
 
-  const expectedSignature = crypto
-    .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-    .update(body)
-    .digest("hex");
+    if (generated_signature !== razorpay_signature) {
+      return res.status(400).json({ error: "Invalid signature" });
+    }
 
-  if (expectedSignature === razorpay_signature) {
+    // 🔥 STEP 2: SAVE TO DB
+    const { error } = await supabase.from("payments").insert([
+      {
+        user_id,
+        razorpay_order_id,
+        razorpay_payment_id,
+        amount,
+        status: "success"
+      }
+    ]);
+
+    if (error) {
+      console.error("DB ERROR:", error);
+      return res.status(500).json({ error });
+    }
+
     res.json({ success: true });
-  } else {
-    res.status(400).json({ success: false });
+
+  } catch (err) {
+    console.error("VERIFY ERROR:", err);
+    res.status(500).json({ error: err.message });
   }
 });
 
-// Start server
-const PORT = 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// START SERVER
+app.listen(5000, () => console.log("Server running on port 5000"));
