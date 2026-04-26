@@ -22,7 +22,7 @@ const BuyerSidebar = () => {
           <div className="nav-icon"></div>
           <span>Tracking</span>
         </NavLink>
-        <NavLink to="/buyer/payments" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
+       <NavLink to="/payments" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
           <div className="nav-icon"></div>
           <span>Payments</span>
         </NavLink>

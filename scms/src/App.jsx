@@ -46,6 +46,7 @@ function App() {
           <main className="main-content">
             <Routes>
               <Route path="/" element={<BuyerDashboard />} />
+              <Route path="/payments" element={<Payment />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
