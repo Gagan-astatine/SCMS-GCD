@@ -30,10 +30,6 @@ const Sidebar = () => {
           <div className="nav-icon"></div>
           <span>warehouse</span>
         </NavLink>
-        <NavLink to="/orders" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
-          <div className="nav-icon"></div>
-          <span>Orders</span>
-        </NavLink>
         <NavLink to="/Fleet" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
           <div className="nav-icon"></div>
           <span>Fleet</span>

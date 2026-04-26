@@ -4,6 +4,7 @@ import supabase from './config/SupabaseClient'
 import './App.css';
 import Home from "./pages/home"
 import Auth from "./pages/Auth"
+import Orders from "./pages/Orders"
 import Sidebar from "./components/Sidebar"
 
 function App() {
@@ -37,6 +38,7 @@ function App() {
           <main className="main-content">
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/orders" element={<Orders />} />
               <Route path="*" element={<Home />} />
             </Routes>
           </main>
