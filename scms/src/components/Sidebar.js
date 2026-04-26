@@ -10,9 +10,9 @@ const Sidebar = () => {
       </div>
 
       <nav className="sidebar-nav">
-        <NavLink to="/" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
-          <div className="nav-icon">🏠</div>
-          <span>Home</span>
+        <NavLink to="/orders" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
+          <div className="nav-icon"></div>
+          <span>Orders</span>
         </NavLink>
         <NavLink to="/analytics" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
           <div className="nav-icon"></div>
@@ -22,17 +22,13 @@ const Sidebar = () => {
           <div className="nav-icon"></div>
           <span>Map View</span>
         </NavLink>
-        <NavLink to="/drivers" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
-          <div className="nav-icon">👥</div>
-          <span>Drivers</span>
-        </NavLink>
         <NavLink to="/vehicles" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
           <div className="nav-icon"></div>
           <span>Vehicles</span>
         </NavLink>
-        <NavLink to="/settings" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
+        <NavLink to="/warehouse" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
           <div className="nav-icon"></div>
-          <span>Settings</span>
+          <span>warehouse</span>
         </NavLink>
         <NavLink to="/orders" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
           <div className="nav-icon"></div>
@@ -50,9 +46,17 @@ const Sidebar = () => {
           <div className="nav-icon"></div>
           <span>Drivers</span>
         </NavLink>
-        <NavLink to="/warehouse" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
+        <NavLink to="/AI assistance" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
           <div className="nav-icon"></div>
-          <span>Warehouse</span>
+          <span>AI assistance</span>
+        </NavLink>
+        <NavLink to="/payments" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
+          <div className="nav-icon"></div>
+          <span>Payments</span>
+        </NavLink>
+        <NavLink to="/settings" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
+          <div className="nav-icon"></div>
+          <span>Settings</span>
         </NavLink>
       </nav>
     </div>
