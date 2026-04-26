@@ -34,6 +34,26 @@ const Sidebar = () => {
           <div className="nav-icon"></div>
           <span>Settings</span>
         </NavLink>
+        <NavLink to="/orders" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
+          <div className="nav-icon"></div>
+          <span>Orders</span>
+        </NavLink>
+        <NavLink to="/Fleet" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
+          <div className="nav-icon"></div>
+          <span>Fleet</span>
+        </NavLink>
+        <NavLink to="/Dispatch" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
+          <div className="nav-icon"></div>
+          <span>Dispatch</span>
+        </NavLink>
+        <NavLink to="/drivers" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
+          <div className="nav-icon"></div>
+          <span>Drivers</span>
+        </NavLink>
+        <NavLink to="/warehouse" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
+          <div className="nav-icon"></div>
+          <span>Warehouse</span>
+        </NavLink>
       </nav>
     </div>
   );
