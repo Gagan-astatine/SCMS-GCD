@@ -6,6 +6,7 @@ import Home from "./pages/home"
 import Auth from "./pages/Auth"
 import Orders from "./pages/Orders"
 import Sidebar from "./components/Sidebar"
+import Payment from "./pages/payment";
 
 function App() {
   const [session, setSession] = useState(null)
