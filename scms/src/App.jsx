@@ -9,6 +9,7 @@ import BuyerDashboard from "./pages/BuyerDashboard"
 import DriverDashboard from "./pages/DriverDashboard"
 
 import Sidebar from "./components/Sidebar"
+import Payment from "./pages/payment";
 import BuyerSidebar from "./components/BuyerSidebar"
 import DriverSidebar from "./components/DriverSidebar"
 
