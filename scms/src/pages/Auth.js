@@ -4,6 +4,7 @@ import supabase from '../config/SupabaseClient'
 const Auth = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [role, setRole] = useState('seller')
   const [isLogin, setIsLogin] = useState(true)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -25,6 +26,11 @@ const Auth = () => {
       const { error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: {
+            role: role
+          }
+        }
       })
       if (error) {
         setError(error.message)
@@ -44,13 +50,29 @@ const Auth = () => {
         <p className="auth-subtitle">
           {isLogin
             ? 'Enter your details to access the system.'
-            : 'Sign up to start managing your loads.'}
+            : 'Sign up to start managing your logistics.'}
         </p>
 
         {error && <p className="auth-error">{error}</p>}
         {message && <p className="auth-message">{message}</p>}
 
         <form onSubmit={handleSubmit} className="auth-form">
+          {!isLogin && (
+            <div className="input-group">
+              <label htmlFor="role">I am a...</label>
+              <select 
+                id="role" 
+                value={role} 
+                onChange={(e) => setRole(e.target.value)}
+                style={{ padding: '12px 16px', borderRadius: '10px', border: '1px solid #cbd5e1', outline: 'none' }}
+              >
+                <option value="seller">Seller</option>
+                <option value="buyer">Buyer</option>
+                <option value="driver">Driver</option>
+              </select>
+            </div>
+          )}
+
           <div className="input-group">
             <label htmlFor="email">Email</label>
             <input
