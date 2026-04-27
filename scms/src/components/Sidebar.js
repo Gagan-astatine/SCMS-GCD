@@ -22,13 +22,9 @@ const Sidebar = () => {
           <div className="nav-icon"></div>
           <span>Map View</span>
         </NavLink>
-        <NavLink to="/vehicles" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
-          <div className="nav-icon"></div>
-          <span>Vehicles</span>
-        </NavLink>
         <NavLink to="/warehouse" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
           <div className="nav-icon"></div>
-          <span>warehouse</span>
+          <span>Warehouse</span>
         </NavLink>
         <NavLink to="/Fleet" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
           <div className="nav-icon"></div>

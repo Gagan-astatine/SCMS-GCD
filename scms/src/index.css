@@ -376,3 +376,196 @@ code {
   margin: 0 auto;
   padding: 20px;
 }
+
+/* Warehouse & Fleet & Dispatch & Driver UI Styles */
+.page.warehouse, .page.fleet, .page.dispatch, .page.driver {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.warehouse-list, .fleet-list, .dispatch-list, .driver-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
+  margin-top: 20px;
+}
+
+.warehouse-card, .fleet-card, .dispatch-card, .driver-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.warehouse-card::before, .fleet-card::before, .dispatch-card::before, .driver-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #3b82f6, #8b5cf6);
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+/* Fleet specific gradient */
+.fleet-card::before {
+  background: linear-gradient(180deg, #f59e0b, #ef4444);
+}
+
+/* Dispatch specific gradient */
+.dispatch-card::before {
+  background: linear-gradient(180deg, #8b5cf6, #ec4899);
+}
+
+/* Driver specific gradient */
+.driver-card::before {
+  background: linear-gradient(180deg, #10b981, #06b6d4);
+}
+
+.warehouse-card:hover, .fleet-card:hover, .dispatch-card:hover, .driver-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(148, 163, 184, 0.3);
+}
+
+.warehouse-header, .fleet-header, .dispatch-header, .driver-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+.warehouse-header-left, .fleet-header-left, .dispatch-header-left, .driver-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.warehouse-icon, .fleet-icon, .dispatch-icon, .driver-icon {
+  background: #eff6ff;
+  color: #3b82f6;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Fleet specific icon color */
+.fleet-icon {
+  background: #fffbeb;
+  color: #f59e0b;
+}
+
+/* Dispatch specific icon color */
+.dispatch-icon {
+  background: #faf5ff;
+  color: #8b5cf6;
+}
+
+/* Driver specific icon color */
+.driver-icon {
+  background: #ecfdf5;
+  color: #10b981;
+}
+
+.warehouse-header h3, .fleet-header h3, .dispatch-header h3, .driver-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #0f172a;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.warehouse-header-badge, .fleet-header-badge, .dispatch-header-badge, .driver-header-badge {
+  font-size: 0.75rem;
+  background: #f1f5f9;
+  color: #475569;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  border: 1px solid #e2e8f0;
+}
+
+.warehouse-details, .fleet-details, .dispatch-details, .driver-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  flex: 1;
+}
+
+.warehouse-details .detail-item, .fleet-details .detail-item, .dispatch-details .detail-item, .driver-details .detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.warehouse-details .detail-item.full-width, .fleet-details .detail-item.full-width, .dispatch-details .detail-item.full-width, .driver-details .detail-item.full-width {
+  grid-column: 1 / -1;
+  background: #f8fafc;
+  padding: 14px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  border: 1px solid #f1f5f9;
+}
+
+.warehouse-details .detail-item.full-width .detail-value, .fleet-details .detail-item.full-width .detail-value, .dispatch-details .detail-item.full-width .detail-value, .driver-details .detail-item.full-width .detail-value {
+  font-size: 0.95rem;
+  color: #334155;
+  line-height: 1.4;
+}
+
+.warehouse-details .detail-value, .fleet-details .detail-value, .dispatch-details .detail-value, .driver-details .detail-value {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.warehouse-details .stat-inbound .detail-value { color: #3b82f6; }
+.warehouse-details .stat-outbound .detail-value { color: #f59e0b; }
+.warehouse-details .stat-onhand .detail-value { color: #10b981; }
+
+.fleet-details .stat-driver .detail-value, .dispatch-details .stat-driver .detail-value { color: #3b82f6; }
+.fleet-details .stat-running .detail-value { color: #10b981; }
+.fleet-details .stat-stopped .detail-value { color: #ef4444; }
+
+.dispatch-details .stat-assigned .detail-value { color: #10b981; }
+.dispatch-details .stat-unassigned .detail-value { color: #ef4444; }
+
+.driver-details .stat-status .detail-value { color: #10b981; }
+.driver-details .stat-rating .detail-value { color: #f59e0b; }
+
+.warehouse-title h2, .fleet-title h2, .dispatch-title h2, .driver-title h2 {
+  font-size: 2rem;
+  color: #0f172a;
+  margin: 0;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.warehouse-title p, .fleet-title p, .dispatch-title p, .driver-title p {
+  color: #64748b;
+  margin: 8px 0 0;
+  font-size: 1rem;
+}
