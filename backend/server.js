@@ -1,3 +1,13 @@
+const dotenv = require("dotenv");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+
+dotenv.config();
+
+let genAI = null;
+if (process.env.GEMINI_API_KEY) {
+  genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+}
+
 const express = require("express");
 const Razorpay = require("razorpay");
 const cors = require("cors");
@@ -84,6 +94,56 @@ app.post("/api/payment/verify", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+app.post("/ai-dispatch", async (req, res) => {
+  try {
+    const { fleet, loads, drivers, warehouse, query } = req.body
+
+    if (!genAI) {
+      return res.json({ reply: "Error: AI is not configured. Please add your GEMINI_API_KEY to the backend/.env file and restart the server." });
+    }
+
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
+
+    const prompt = `
+You are a smart logistics AI assistant.
+
+DATA:
+Fleet: ${JSON.stringify(fleet)}
+Loads: ${JSON.stringify(loads)}
+Drivers: ${JSON.stringify(drivers)}
+Warehouse: ${JSON.stringify(warehouse)}
+
+USER QUERY:
+${query}
+
+TASK:
+1. Identify problems
+2. Explain reasons
+3. Suggest actions
+4. Keep answer short and structured
+
+FORMAT:
+Problems:
+- ...
+
+Reasons:
+- ...
+
+Actions:
+- ...
+`
+
+    const result = await model.generateContent(prompt)
+    const reply = result.response.text()
+
+    res.json({ reply })
+
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ error: "AI failed" })
+  }
+})
 
 // START SERVER
 app.listen(5000, () => console.log("Server running on port 5000"));
