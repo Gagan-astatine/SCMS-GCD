@@ -8,7 +8,18 @@
     "analytics": "విశ్లేషణలు",
     "ai_assistance": "AI సహాయం",
     "settings": "సెట్టింగ్‌లు",
-    "dispatch": "డిస్పాచ్"
+    "dispatch": "డిస్పాచ్",
+    "assigned_loads": "Assigned Loads",
+    "tracking": "Tracking",
+    "earnings": "Earnings",
+    "driver_portal": "Driver Portal",
+    "delivery_routes": "Delivery Routes",
+    "logout": "Logout",
+    "my_purchases": "My Purchases",
+    "invoices": "Invoices",
+    "payments": "Payments",
+    "buyer_portal": "Buyer Portal",
+    "purchasing_control": "Purchasing Control"
   },
   "cards": {
     "total_warehouses": "మొత్తం గోదాములు",

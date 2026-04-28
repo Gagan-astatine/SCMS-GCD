@@ -942,6 +942,143 @@ code {
   /* Hide bottom border on mobile drawer */
 }
 
+/* --- Payment UI --- */
+.payment-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 100px); /* Account for header */
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.payment-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.4) saturate(1.2);
+  z-index: 0;
+}
+
+.payment-card {
+  position: relative;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 24px;
+  padding: 40px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255,255,255,0.1);
+  color: white;
+}
+
+.payment-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.payment-header h2 {
+  font-size: 2.2rem;
+  color: #fff;
+  margin: 0 0 8px;
+  font-family: 'Oswald', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.payment-header p {
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  font-size: 1rem;
+}
+
+.payment-details {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 1.05rem;
+}
+
+.detail-row:last-of-type {
+  margin-bottom: 0;
+}
+
+.detail-row span {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.detail-row strong {
+  color: #fff;
+}
+
+.divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 16px 0;
+}
+
+.total-row {
+  font-size: 1.25rem;
+  font-weight: 700;
+  align-items: center;
+}
+
+.total-amount {
+  color: #f97316 !important;
+  font-size: 1.5rem;
+}
+
+.btn-pay-now {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(249, 115, 22, 0.3);
+}
+
+.btn-pay-now:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(249, 115, 22, 0.5);
+}
+
+.lock-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.payment-footer {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
 @media (max-width: 1024px) {
   .top-nav-links {
     display: none;
