@@ -32,7 +32,33 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* --- Warehouse Map Pulse Animation --- */
+.pulse-circle {
+  animation: pulse-animation 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse-animation {
+  0% {
+    stroke-width: 3;
+    stroke-opacity: 1;
+    fill-opacity: 0.7;
+  }
+
+  50% {
+    stroke-width: 15;
+    stroke-opacity: 0.2;
+    fill-opacity: 0.4;
+  }
+
+  100% {
+    stroke-width: 3;
+    stroke-opacity: 1;
+    fill-opacity: 0.7;
   }
 }

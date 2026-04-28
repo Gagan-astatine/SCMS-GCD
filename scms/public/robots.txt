@@ -1,3 +1,71 @@
-# https://www.robotstxt.org/robotstxt.html
-User-agent: *
-Disallow:
+import os
+import sqlite3
+import streamlit as st
+from dotenv import load_dotenv
+from google import genai  
+
+# 1. Load your API key
+load_dotenv()
+
+# 2. Setup the Client (Replaces genai.configure)
+# In 2026, we use a Client object to manage the connection
+client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+
+# 3. Modern Function to get Gemini Response
+def get_gemini_response(question, prompt):
+    # Using 'gemini-2.0-flash' - the current stable standard
+    response = client.models.generate_content(
+        model='gemini-3.1-flash-lite-preview',
+        contents=[prompt[0], question]
+    )
+    return response.text
+
+# 4. Database Function (Stays the same)
+def read_sql_query(sql, db):
+    conn = sqlite3.connect(db)
+    cur = conn.cursor()
+    cur.execute(sql)
+    rows = cur.fetchall()
+    conn.commit()
+    conn.close()
+    return rows
+
+# 5. The Prompt (Telling Gemini how to behave)
+prompt = [
+    """
+    You are an expert in converting English questions to SQL query!
+    The SQL database has the name STUDENT and has the following columns - NAME, CLASS, 
+    SECTION, MARKS.
+    
+    Example: How many records are there?, the SQL command will be: SELECT COUNT(*) FROM STUDENT;
+    
+    The output should only be the SQL command, no backticks, no 'sql' text.
+    """
+]
+
+# 6. Streamlit UI
+st.set_page_config(page_title="I can Retrieve Any SQL query")
+st.header(" Text/Voice To Convert text into SQL Query")
+
+question = st.text_input("Input: ", key="input")
+submit = st.button("Ask the question")
+
+if submit:
+    # Get the SQL query from Gemini
+    sql_query = get_gemini_response(question, prompt)
+    
+    # Display the generated SQL in the app
+    st.subheader("Generated SQL:")
+    st.code(sql_query, language="sql")
+    
+    # Execute and show results
+    try:
+        response_data = read_sql_query(sql_query, "student.db")
+        st.subheader("The Response is")
+        if response_data:
+            for row in response_data:
+                st.write(row)
+        else:
+            st.write("No records found for that query.")
+    except Exception as e:
+        st.error(f"Something went wrong with the SQL: {e}")

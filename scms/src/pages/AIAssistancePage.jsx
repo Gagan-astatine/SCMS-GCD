@@ -1,0 +1,142 @@
+import React, { useEffect, useState } from 'react';
+import supabase from '../config/SupabaseClient'; 
+import AIAssistant from '../components/AIAssistant';
+import { useTranslation } from 'react-i18next';
+
+const AIAssistancePage = () => {
+    const { t } = useTranslation();
+    const [stats, setStats] = useState({
+        overflowing: 0,
+        activeTrucks: 0,
+        unassignedOrders: 0,
+        availableDrivers: 0
+    });
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                // 1. Warehouses (Overflowing)
+                const { data: wData } = await supabase.from('warehouses').select('*');
+                let overflowing = 0;
+                if (wData) {
+                    overflowing = wData.filter(w => ((w.current_load + (w.reserved_space || 0)) / (w.max_capacity || 1)) > 0.85).length;
+                }
+
+                // 2. Fleet (Active Trucks)
+                const { data: fData } = await supabase.from('Fleet').select('*');
+                let activeTrucks = 0;
+                if (fData) {
+                    activeTrucks = fData.filter(t => t.vehicle_status === true || t.vehicle_status === 'true').length;
+                }
+
+                // 3. Orders (Unassigned)
+                const { data: oData } = await supabase.from('Load').select('*');
+                let unassignedOrders = 0;
+                if (oData) {
+                    unassignedOrders = oData.filter(o => o.unassigned === true || o.unassigned === 'true' || o.status?.toLowerCase() === 'unassigned').length;
+                }
+
+                // 4. Drivers (Available)
+                const { data: dData } = await supabase.from('driver').select('*');
+                let availableDrivers = 0;
+                if (dData) {
+                    availableDrivers = dData.filter(d => d.status?.toLowerCase() === 'available').length;
+                }
+
+                setStats({ overflowing, activeTrucks, unassignedOrders, availableDrivers });
+            } catch (err) {
+                console.error("Failed to fetch live stats", err);
+            }
+        };
+
+        // Fetch immediately, then every 30 seconds
+        fetchStats();
+        const interval = setInterval(fetchStats, 30000);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    const cardStyle = {
+        backgroundColor: '#1e293b',
+        borderRadius: '12px',
+        padding: '24px',
+        border: '1px solid #334155',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '8px',
+        boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)'
+    };
+
+    return (
+        <div style={{ 
+            display: 'flex', 
+            height: 'calc(100vh - 40px)', 
+            padding: '20px', 
+            gap: '24px', 
+            backgroundColor: '#0f172a', 
+            boxSizing: 'border-box' 
+        }}>
+            {/* Left: AI Chat (70%) */}
+            <div style={{ 
+                flex: '7', 
+                borderRadius: '12px', 
+                overflow: 'hidden', 
+                border: '1px solid #334155', 
+                boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+                display: 'flex',
+                flexDirection: 'column'
+            }}>
+                <AIAssistant />
+            </div>
+
+            {/* Right: Live Stats Sidebar (30%) */}
+            <div style={{ 
+                flex: '3', 
+                display: 'flex', 
+                flexDirection: 'column', 
+                gap: '20px',
+                overflowY: 'auto'
+            }}>
+                <div style={{ padding: '0 4px' }}>
+                    <h2 style={{ margin: '0 0 4px 0', color: 'white', fontSize: '1.25rem' }}>Live Context</h2>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <div style={{ width: '8px', height: '8px', backgroundColor: '#3b82f6', borderRadius: '50%', animation: 'pulse 2s infinite' }}></div>
+                        <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.85rem' }}>Auto-updating every 30s</p>
+                    </div>
+                </div>
+
+                <div style={cardStyle}>
+                    <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.85rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('cards.overflowing_now', 'Overflowing Warehouses')}</p>
+                    <h3 style={{ margin: 0, color: stats.overflowing > 0 ? '#ef4444' : 'white', fontSize: '2.5rem' }}>{stats.overflowing}</h3>
+                </div>
+
+                <div style={cardStyle}>
+                    <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.85rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('cards.active_trucks', 'Active Trucks')}</p>
+                    <h3 style={{ margin: 0, color: '#10b981', fontSize: '2.5rem' }}>{stats.activeTrucks}</h3>
+                </div>
+
+                <div style={cardStyle}>
+                    <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.85rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Unassigned Orders</p>
+                    <h3 style={{ margin: 0, color: stats.unassignedOrders > 0 ? '#f59e0b' : 'white', fontSize: '2.5rem' }}>{stats.unassignedOrders}</h3>
+                </div>
+
+                <div style={cardStyle}>
+                    <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.85rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('cards.available_drivers', 'Available Drivers')}</p>
+                    <h3 style={{ margin: 0, color: '#3b82f6', fontSize: '2.5rem' }}>{stats.availableDrivers}</h3>
+                </div>
+            </div>
+
+            <style>
+                {`
+                @keyframes pulse {
+                    0% { opacity: 1; transform: scale(1); }
+                    50% { opacity: 0.5; transform: scale(1.2); }
+                    100% { opacity: 1; transform: scale(1); }
+                }
+                `}
+            </style>
+        </div>
+    );
+};
+
+export default AIAssistancePage;
