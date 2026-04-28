@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import supabase from '../config/SupabaseClient';
 
 const BuyerSidebar = () => {
-  const { t } = useTranslation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -12,11 +10,11 @@ const BuyerSidebar = () => {
   };
 
   const navLinks = [
-    { to: "/orders", label: t('navigation.my_purchases') },
-    { to: "/buyer/invoices", label: t('navigation.invoices') },
-    { to: "/map", label: t('navigation.tracking') },
-    { to: "/payments", label: t('navigation.payments') },
-    { to: "/settings", label: t('navigation.settings') }
+    { to: "/orders", label: 'My Purchases' },
+    { to: "/buyer/invoices", label: 'Invoices' },
+    { to: "/map", label: 'Tracking' },
+    { to: "/payments", label: 'Payments' },
+    { to: "/settings", label: 'Settings' }
   ];
 
   return (
@@ -50,8 +48,9 @@ const BuyerSidebar = () => {
 
         {/* Right: Actions */}
         <div className="top-navbar-right">
+          <div id="google_translate_element"></div>
           <button onClick={handleLogout} className="btn-logout-nav">
-            {t('navigation.logout')}
+            Logout
           </button>
         </div>
       </header>
@@ -88,7 +87,7 @@ const BuyerSidebar = () => {
             marginTop: 'auto'
           }}
         >
-          {t('navigation.logout')}
+          Logout
         </button>
       </nav>
     </>

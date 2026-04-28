@@ -2,18 +2,16 @@ import React, { useState, useRef, useEffect } from 'react';
 import { detectIntent } from '../hooks/useAIIntent';
 import supabase from '../config/SupabaseClient';
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { useTranslation } from 'react-i18next';
 
 const AIAssistant = () => {
-    const { t } = useTranslation();
-    const genAI = new GoogleGenerativeAI(
+        const genAI = new GoogleGenerativeAI(
         process.env.REACT_APP_GEMINI_API_KEY
     );
     const model = genAI.getGenerativeModel({
         model: "gemini-3.1-flash-lite-preview"
     });
     const [messages, setMessages] = useState([
-        { role: 'ai', text: t('ai.greeting', 'Hello! I am your SCMS Co-Pilot. How can I help you manage your supply chain today?'), timestamp: new Date() }
+        { role: 'ai', text: 'Hello! I am your SCMS Co-Pilot. How can I help you manage your supply chain today?', timestamp: new Date() }
     ]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
@@ -21,10 +19,10 @@ const AIAssistant = () => {
     const messagesEndRef = useRef(null);
 
     const suggestions = [
-        t('warehouse.warehouse_status', "Warehouse status"),
-        t('drivers.driver_availability', "Driver availability"),
-        t('ai.todays_summary', "Today's summary"),
-        t('orders.order_overview', "Order overview")
+        "Warehouse status",
+        "Driver availability",
+        "Today's summary",
+        "Order overview"
     ];
 
     const scrollToBottom = () => {
@@ -37,11 +35,11 @@ const AIAssistant = () => {
 
     const formatTimeAgo = (timestamp) => {
         const minutesAgo = Math.floor((new Date() - new Date(timestamp)) / 60000);
-        if (minutesAgo === 0) return t('just_now', 'Just now');
-        if (minutesAgo === 1) return t('mins_ago', { count: 1 });
-        if (minutesAgo < 60) return t('mins_ago', { count: minutesAgo });
+        if (minutesAgo === 0) return 'Just now';
+        if (minutesAgo === 1) return '1 min ago';
+        if (minutesAgo < 60) return minutesAgo + ' mins ago';
         const hoursAgo = Math.floor(minutesAgo / 60);
-        return t('hours_ago', { count: hoursAgo });
+        return hoursAgo + ' hours ago';
     };
 
     const formatMessageText = (text) => {
@@ -198,7 +196,7 @@ const AIAssistant = () => {
                     borderRadius: '50%',
                     boxShadow: '0 0 8px #22c55e'
                 }} />
-                <h2 style={{ margin: 0, fontSize: '1.2rem', color: '#f97316', textTransform: 'uppercase' }}>{t('ai.ai_copilot', 'AI Co-Pilot')}</h2>
+                <h2 style={{ margin: 0, fontSize: '1.2rem', color: '#f97316', textTransform: 'uppercase' }}>AI Co-Pilot</h2>
             </div>
 
             {/* Messages Area */}
@@ -340,7 +338,7 @@ const AIAssistant = () => {
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder={t('ai.ask_supply_chain', "Ask about your supply chain...")}
+                        placeholder="Ask about your supply chain..."
                         style={{
                             flex: 1,
                             backgroundColor: '#f8fafc',
