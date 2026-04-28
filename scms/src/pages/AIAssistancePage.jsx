@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import supabase from '../config/SupabaseClient'; 
+import supabase from '../config/SupabaseClient';
 import AIAssistant from '../components/AIAssistant';
 
 const AIAssistancePage = () => {
-        const [stats, setStats] = useState({
+    const [stats, setStats] = useState({
         overflowing: 0,
         activeTrucks: 0,
         unassignedOrders: 0,
@@ -24,7 +24,10 @@ const AIAssistancePage = () => {
                 const { data: fData } = await supabase.from('Fleet').select('*');
                 let activeTrucks = 0;
                 if (fData) {
-                    activeTrucks = fData.filter(t => t.vehicle_status === true || t.vehicle_status === 'true').length;
+                    activeTrucks = fData.filter(t => 
+                        t.vehicle_status === true || t.vehicle_status === 'true' || 
+                        t["vehicle status"] === true || t["vehicle status"] === 'true'
+                    ).length;
                 }
 
                 // 3. Orders (Unassigned)
@@ -68,18 +71,18 @@ const AIAssistancePage = () => {
     };
 
     return (
-        <div className="ai-page-container" style={{ 
-            padding: '20px', 
-            gap: '24px', 
-            backgroundColor: 'transparent', 
+        <div className="ai-page-container" style={{
+            padding: '20px',
+            gap: '24px',
+            backgroundColor: 'transparent',
             boxSizing: 'border-box',
             minHeight: 'calc(100vh - 70px)'
         }}>
             {/* Left: AI Chat */}
-            <div className="ai-chat-container" style={{ 
-                borderRadius: '12px', 
-                overflow: 'hidden', 
-                border: '1px solid rgba(249, 115, 22, 0.3)', 
+            <div className="ai-chat-container" style={{
+                borderRadius: '12px',
+                overflow: 'hidden',
+                border: '1px solid rgba(249, 115, 22, 0.3)',
                 boxShadow: '0 4px 30px rgba(0, 0, 0, 0.05)',
                 display: 'flex',
                 flexDirection: 'column',
@@ -90,9 +93,9 @@ const AIAssistancePage = () => {
             </div>
 
             {/* Right: Live Stats Sidebar */}
-            <div className="ai-stats-container" style={{ 
-                display: 'flex', 
-                flexDirection: 'column', 
+            <div className="ai-stats-container" style={{
+                display: 'flex',
+                flexDirection: 'column',
                 gap: '20px',
                 overflowY: 'auto'
             }}>

@@ -6,9 +6,13 @@ export const detectIntent = (message) => {
 
     // Define the keyword categories exactly as requested
     const categories = {
-        warehouses: ["warehouse", "overflow", "capacity", "reroute"],
-        orders: ["order", "delivery", "customer", "pickup", "drop", "eta"],
-        logs: ["today", "summary", "report", "happened", "logs"]
+        warehouses: ["warehouse", "capacity", "inventory", "stock"],
+        orders: ["order", "delivery", "load", "eta", "customer", "pickup"],
+        logs: ["logs", "activity", "happened", "history", "alerts"],
+        fleet: ["fleet", "truck", "vehicle", "status", "tracking"],
+        drivers: ["driver", "rating", "trip", "available"],
+        payments: ["payment", "invoice", "money", "transaction", "billing"],
+        reroutes: ["reroute", "divert", "change route"]
     };
 
     const matchedCategories = [];

@@ -39,16 +39,17 @@ const Dispatch = () => {
 
         const fetchDrivers = async () => {
             const { data, error } = await supabase
-                .from('profiles')
-                .select('id, role')
-                .eq('role', 'driver')
+                .from('driver')
+                .select('driver_id, name, status, rating')
+                .ilike('status', 'available')
 
             if (error) {
                 console.log("Driver fetch error:", error)
                 return
             }
 
-            setDrivers(data)
+            console.log("Fetched available drivers:", data)
+            setDrivers(data || [])
         }
 
         fetchLoads()
@@ -121,9 +122,23 @@ const Dispatch = () => {
         ) : (
           <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
             {drivers.map((driver) => (
-              <span key={driver.id} style={{ background: '#f8fafc', padding: '8px 16px', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '0.85rem', fontWeight: '600', color: '#475569' }}>
-                ID: {driver.id.substring(0, 8)}...
-              </span>
+              <div key={driver.driver_id} style={{ 
+                  background: '#f8fafc', 
+                  padding: '12px 20px', 
+                  borderRadius: '16px', 
+                  border: '1px solid #e2e8f0', 
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '4px'
+              }}>
+                <span style={{ fontWeight: '700', color: '#0f172a', fontSize: '1rem' }}>{driver.name}</span>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <span style={{ color: '#10b981', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase' }}>{driver.status}</span>
+                    <span style={{ color: '#64748b', fontSize: '0.75rem' }}>•</span>
+                    <span style={{ color: '#f59e0b', fontSize: '0.75rem', fontWeight: 'bold' }}>⭐ {driver.rating || "N/A"}</span>
+                </div>
+                <span style={{ color: '#94a3b8', fontSize: '0.7rem', fontFamily: 'monospace' }}>ID: {driver.driver_id}</span>
+              </div>
             ))}
           </div>
         )}

@@ -102,27 +102,46 @@ const AIAssistant = () => {
             try {
                 if (intent === "warehouses") {
                     const { data } = await supabase.from("warehouses").select("*");
-                    contextData = data || [];
+                    contextData = { warehouses: data || [] };
                 } else if (intent === "orders") {
-                    const { data } = await supabase.from("Load").select("*").limit(20);
-                    contextData = data || [];
+                    const { data } = await supabase.from("Load").select("*").limit(30);
+                    contextData = { orders: data || [] };
                 } else if (intent === "logs") {
-                    const { data } = await supabase.from("warehouse_logs").select("*").limit(10);
-                    contextData = data || [];
+                    const { data } = await supabase.from("warehouse_logs").select("*").limit(15);
+                    contextData = { logs: data || [] };
                 } else if (intent === "fleet") {
                     const { data } = await supabase.from("Fleet").select("*");
-                    contextData = data || [];
+                    contextData = { fleet: data || [] };
                 } else if (intent === "drivers") {
                     const { data } = await supabase.from("driver").select("*");
-                    contextData = data || [];
+                    const { data: eData } = await supabase.from("driver_earnings").select("*").limit(10);
+                    contextData = { drivers: data || [], driver_earnings_sample: eData || [] };
+                } else if (intent === "payments") {
+                    const { data } = await supabase.from("payments").select("*").limit(20);
+                    contextData = { payments: data || [] };
+                } else if (intent === "reroutes") {
+                    const { data } = await supabase.from("truck_reroutes").select("*");
+                    contextData = { reroutes: data || [] };
                 } else if (intent === "all") {
-                    const { count: wCount } = await supabase.from("warehouses").select("*", { count: 'exact', head: true });
-                    const { count: lCount } = await supabase.from("warehouse_logs").select("*", { count: 'exact', head: true });
-                    contextData = { warehousesCount: wCount || 0, logsCount: lCount || 0 };
+                    // Fetch a summary of everything
+                    const [w, l, f, d, p] = await Promise.all([
+                        supabase.from("warehouses").select("*"),
+                        supabase.from("Load").select("*").limit(10),
+                        supabase.from("Fleet").select("*"),
+                        supabase.from("driver").select("*"),
+                        supabase.from("payments").select("*").limit(5)
+                    ]);
+                    contextData = {
+                        warehouses: w.data || [],
+                        recentOrders: l.data || [],
+                        fleetStatus: f.data || [],
+                        drivers: d.data || [],
+                        recentPayments: p.data || []
+                    };
                 }
             } catch (err) {
                 console.error("Supabase fetch error:", err);
-                contextData = [];
+                contextData = { error: "Failed to fetch live data" };
             }
 
             // 4. Build the Gemini prompt

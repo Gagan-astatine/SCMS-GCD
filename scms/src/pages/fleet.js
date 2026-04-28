@@ -8,7 +8,7 @@ const Fleet = () => {
   useEffect(() => {
     const fetchFleet = async () => {
       const { data, error } = await supabase
-        .from('Fleet')   
+        .from('Fleet')
         .select()
 
       if (error) {
@@ -49,10 +49,10 @@ const Fleet = () => {
                   <div className="fleet-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
                   </div>
-                  <h3>{vehicle.vehicle_id}</h3>
+                  <h3>{vehicle["Vehicle Id"] || vehicle.vehicle_id}</h3>
                 </div>
                 <span className="fleet-header-badge">
-                  {vehicle.vehicle_status ? "Active 🟢" : "Inactive 🔴"}
+                  {(vehicle["vehicle status"] === true || vehicle["vehicle status"] === 'true' || vehicle.vehicle_status) ? "Active 🟢" : "Inactive 🔴"}
                 </span>
               </div>
 
@@ -65,13 +65,13 @@ const Fleet = () => {
 
                 <div className="detail-item full-width">
                   <span className="detail-label">LOCATION</span>
-                  <span className="detail-value">{vehicle.location}</span>
+                  <span className="detail-value">{vehicle.loaction || vehicle.location}</span>
                 </div>
 
-                <div className={`detail-item ${vehicle.vehicle_status ? 'stat-running' : 'stat-stopped'}`}>
+                <div className={`detail-item ${(vehicle["vehicle status"] === true || vehicle["vehicle status"] === 'true' || vehicle.vehicle_status) ? 'stat-running' : 'stat-stopped'}`}>
                   <span className="detail-label">STATUS</span>
                   <span className="detail-value">
-                    {vehicle.vehicle_status ? "Running" : "Stopped"}
+                    {(vehicle["vehicle status"] === true || vehicle["vehicle status"] === 'true' || vehicle.vehicle_status) ? "Running" : "Stopped"}
                   </span>
                 </div>
 
