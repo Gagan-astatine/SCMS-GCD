@@ -4,7 +4,6 @@ import {
     BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
     PieChart, Pie, Cell, CartesianGrid, Legend
 } from 'recharts';
-import { useTranslation } from 'react-i18next';
 
 const AnimatedChart = ({ children }) => {
     const [isVisible, setIsVisible] = useState(false);
@@ -28,8 +27,7 @@ const AnimatedChart = ({ children }) => {
 };
 
 const AnalyticsPage = () => {
-    const { t, i18n } = useTranslation();
-    const [data, setData] = useState({
+        const [data, setData] = useState({
         warehouses: [],
         logs: [],
         reroutes: [],
@@ -136,7 +134,7 @@ const AnalyticsPage = () => {
     if (loading) {
         return (
             <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8fafc', color: '#1e293b' }}>
-                <h2>{t('loading', 'Loading Analytics...')}</h2>
+                <h2>Loading Analytics...</h2>
             </div>
         );
     }
@@ -161,7 +159,7 @@ const AnalyticsPage = () => {
         const fillPercent = Math.round(((w.current_load + (w.reserved_space || 0)) / (w.max_capacity || 1)) * 100);
 
         return {
-            name: t(w.name?.toLowerCase(), w.name || 'Unknown'),
+            name: w.name || 'Unknown',
             fillPercent,
             current_load: w.current_load || 0,
             max_capacity: w.max_capacity || 0,
@@ -171,7 +169,7 @@ const AnalyticsPage = () => {
 
     // SECTION 3
     const orderStatusCounts = data.orders.reduce((acc, order) => {
-        const status = order.status ? t(order.status.toLowerCase(), order.status) : t('pending', 'Pending');
+        const status = order.status ? order.status : 'Pending';
         acc[status] = (acc[status] || 0) + 1;
         return acc;
     }, {});
@@ -184,8 +182,8 @@ const AnalyticsPage = () => {
 
     // SECTION 4
     const fleetDonutData = [
-        { name: t('active', 'Active'), value: activeTrucks },
-        { name: t('inactive', 'Inactive'), value: totalTrucks - activeTrucks }
+        { name: 'Active', value: activeTrucks },
+        { name: 'Inactive', value: totalTrucks - activeTrucks }
     ];
     const DONUT_COLORS = ['#10b981', '#64748b'];
 
@@ -194,7 +192,7 @@ const AnalyticsPage = () => {
 
     // SECTION 7
     const ioData = data.warehouseStats.map(w => ({
-        name: t(w.warehouse_name?.toLowerCase(), w.warehouse_name || 'Unknown'),
+        name: w.warehouse_name || 'Unknown',
         inbound: Number(w.inbound) || 0,
         outbound: Number(w.outbound) || 0,
         onhand: Number(w.onhand) || 0
@@ -218,33 +216,33 @@ const AnalyticsPage = () => {
 
     return (
         <div style={{ padding: '24px', backgroundColor: 'transparent', minHeight: '100vh', color: '#1e293b', boxSizing: 'border-box' }}>
-            <h1 style={{ margin: '0 0 24px 0', color: '#f97316', textTransform: 'uppercase' }}>{t('analytics.dashboard', 'SCMS Analytics Dashboard')}</h1>
+            <h1 style={{ margin: '0 0 24px 0', color: '#f97316', textTransform: 'uppercase' }}>SCMS Analytics Dashboard</h1>
 
             {/* SECTION 1: Top KPI Cards */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', marginBottom: '24px' }}>
                 <div style={cardStyle}>
-                    <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>{t('cards.total_warehouses', 'Total Warehouses')}</p>
-                    <h2 style={{ margin: '8px 0 0 0', fontSize: '2rem', color: '#1e293b' }}>{data.warehouses.length > 0 ? totalWarehouses.toLocaleString(i18n.language) : '-'}</h2>
+                    <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>Total Warehouses</p>
+                    <h2 style={{ margin: '8px 0 0 0', fontSize: '2rem', color: '#1e293b' }}>{data.warehouses.length > 0 ? totalWarehouses.toLocaleString("en") : '-'}</h2>
                 </div>
                 <div style={cardStyle}>
-                    <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>{t('cards.overflowing_now', 'Overflowing Warehouses')}</p>
-                    <h2 style={{ margin: '8px 0 0 0', fontSize: '2rem', color: overflowingWarehouses > 0 ? '#ef4444' : '#1e293b' }}>{data.warehouses.length > 0 ? overflowingWarehouses.toLocaleString(i18n.language) : '-'}</h2>
+                    <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>Overflowing Warehouses</p>
+                    <h2 style={{ margin: '8px 0 0 0', fontSize: '2rem', color: overflowingWarehouses > 0 ? '#ef4444' : '#1e293b' }}>{data.warehouses.length > 0 ? overflowingWarehouses.toLocaleString("en") : '-'}</h2>
                 </div>
                 <div style={cardStyle}>
-                    <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>{t('cards.total_trucks', 'Total Trucks')}</p>
-                    <h2 style={{ margin: '8px 0 0 0', fontSize: '2rem', color: '#1e293b' }}>{data.fleet.length > 0 ? totalTrucks.toLocaleString(i18n.language) : '-'}</h2>
+                    <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>Total Trucks</p>
+                    <h2 style={{ margin: '8px 0 0 0', fontSize: '2rem', color: '#1e293b' }}>{data.fleet.length > 0 ? totalTrucks.toLocaleString("en") : '-'}</h2>
                 </div>
                 <div style={cardStyle}>
-                    <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>{t('cards.active_trucks', 'Active Trucks')}</p>
-                    <h2 style={{ margin: '8px 0 0 0', fontSize: '2rem', color: '#10b981' }}>{data.fleet.length > 0 ? activeTrucks.toLocaleString(i18n.language) : '-'}</h2>
+                    <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>Active Trucks</p>
+                    <h2 style={{ margin: '8px 0 0 0', fontSize: '2rem', color: '#10b981' }}>{data.fleet.length > 0 ? activeTrucks.toLocaleString("en") : '-'}</h2>
                 </div>
                 <div style={cardStyle}>
-                    <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>{t('cards.total_orders', 'Total Orders')}</p>
-                    <h2 style={{ margin: '8px 0 0 0', fontSize: '2rem', color: '#1e293b' }}>{data.orders.length > 0 ? totalOrders.toLocaleString(i18n.language) : '-'}</h2>
+                    <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>Total Orders</p>
+                    <h2 style={{ margin: '8px 0 0 0', fontSize: '2rem', color: '#1e293b' }}>{data.orders.length > 0 ? totalOrders.toLocaleString("en") : '-'}</h2>
                 </div>
                 <div style={cardStyle}>
-                    <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>{t('cards.total_drivers', 'Total Drivers')}</p>
-                    <h2 style={{ margin: '8px 0 0 0', fontSize: '2rem', color: '#1e293b' }}>{data.drivers.length > 0 ? totalDrivers.toLocaleString(i18n.language) : '-'}</h2>
+                    <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>Total Drivers</p>
+                    <h2 style={{ margin: '8px 0 0 0', fontSize: '2rem', color: '#1e293b' }}>{data.drivers.length > 0 ? totalDrivers.toLocaleString("en") : '-'}</h2>
                 </div>
             </div>
 
@@ -253,7 +251,7 @@ const AnalyticsPage = () => {
 
                 {/* SECTION 2: Warehouse Capacity */}
                 <div style={cardStyle}>
-                    <h3 style={titleStyle}>{t('analytics.warehouse_capacity', 'Warehouse Capacity (%)')}</h3>
+                    <h3 style={titleStyle}>Warehouse Capacity (%)</h3>
                     <div style={{ width: '100%', height: 300 }}>
                         {warehouseCapacityData.length > 0 ? (
                             <ResponsiveContainer>
@@ -286,7 +284,7 @@ const AnalyticsPage = () => {
                                         <YAxis stroke="#64748b" fontSize={12} />
                                         <Tooltip
                                             contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', color: '#1e293b' }}
-                                            formatter={(value, name, props) => [`${value.toLocaleString(i18n.language)}% (${props.payload.current_load.toLocaleString(i18n.language)}/${props.payload.max_capacity.toLocaleString(i18n.language)})`, t('warehouse.fill_percent', 'Filled')]}
+                                            formatter={(value, name, props) => [`${value.toLocaleString("en")}% (${props.payload.current_load.toLocaleString("en")}/${props.payload.max_capacity.toLocaleString("en")})`, 'Filled']}
                                         />
                                         <Bar dataKey="fillPercent" radius={[6, 6, 0, 0]} isAnimationActive={true} animationDuration={1200} filter="url(#glow)">
                                             {warehouseCapacityData.map((entry, index) => (
@@ -297,14 +295,14 @@ const AnalyticsPage = () => {
                                 </AnimatedChart>
                             </ResponsiveContainer>
                         ) : (
-                            <div style={emptyStateStyle}>{t('no_data', 'No data available')}</div>
+                            <div style={emptyStateStyle}>No data available</div>
                         )}
                     </div>
                 </div>
 
                 {/* SECTION 7: Inbound vs Outbound */}
                 <div style={cardStyle}>
-                    <h3 style={titleStyle}>{t('analytics.inbound_vs_outbound', 'Inbound vs Outbound Volume')}</h3>
+                    <h3 style={titleStyle}>Inbound vs Outbound Volume</h3>
                     <div style={{ width: '100%', height: 300 }}>
                         {ioData.length > 0 ? (
                             <ResponsiveContainer>
@@ -332,16 +330,16 @@ const AnalyticsPage = () => {
                                         <YAxis stroke="#64748b" fontSize={12} />
                                         <Tooltip
                                             contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', color: '#1e293b' }}
-                                            formatter={(value, name, props) => [`${value.toLocaleString(i18n.language)} (${t('warehouse.onhand', 'On hand')}: ${props.payload.onhand.toLocaleString(i18n.language)})`, name]}
+                                            formatter={(value, name, props) => [`${value.toLocaleString("en")} (On hand: ${props.payload.onhand.toLocaleString("en")})`, name]}
                                         />
                                         <Legend wrapperStyle={{ fontSize: '12px', color: '#64748b' }} />
-                                        <Bar dataKey="inbound" name={t('inbound', 'Inbound')} fill="url(#colorInbound)" radius={[4, 4, 0, 0]} isAnimationActive={true} animationDuration={1200} filter="url(#glowInOut)" />
-                                        <Bar dataKey="outbound" name={t('outbound', 'Outbound')} fill="url(#colorOutbound)" radius={[4, 4, 0, 0]} isAnimationActive={true} animationDuration={1200} filter="url(#glowInOut)" />
+                                        <Bar dataKey="inbound" name="Inbound" fill="url(#colorInbound)" radius={[4, 4, 0, 0]} isAnimationActive={true} animationDuration={1200} filter="url(#glowInOut)" />
+                                        <Bar dataKey="outbound" name="Outbound" fill="url(#colorOutbound)" radius={[4, 4, 0, 0]} isAnimationActive={true} animationDuration={1200} filter="url(#glowInOut)" />
                                     </BarChart>
                                 </AnimatedChart>
                             </ResponsiveContainer>
                         ) : (
-                            <div style={emptyStateStyle}>{t('no_data', 'No data available')}</div>
+                            <div style={emptyStateStyle}>No data available</div>
                         )}
                     </div>
                 </div>
@@ -353,7 +351,7 @@ const AnalyticsPage = () => {
                 {/* SECTION 3 & 4: Pie/Donut Charts Container */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                     <div style={cardStyle}>
-                        <h3 style={titleStyle}>{t('analytics.order_status', 'Order Status Distribution')}</h3>
+                        <h3 style={titleStyle}>Order Status Distribution</h3>
                         <div style={{ width: '100%', height: 250 }}>
                             {orderStatusData.length > 0 ? (
                                 <ResponsiveContainer>
@@ -369,13 +367,13 @@ const AnalyticsPage = () => {
                                     </AnimatedChart>
                                 </ResponsiveContainer>
                             ) : (
-                                <div style={emptyStateStyle}>{t('no_data', 'No data available')}</div>
+                                <div style={emptyStateStyle}>No data available</div>
                             )}
                         </div>
                     </div>
 
                     <div style={cardStyle}>
-                        <h3 style={titleStyle}>{t('analytics.fleet_status', 'Fleet Status')}</h3>
+                        <h3 style={titleStyle}>Fleet Status</h3>
                         <div style={{ width: '100%', height: 250 }}>
                             {data.fleet.length > 0 ? (
                                 <ResponsiveContainer>
@@ -394,7 +392,7 @@ const AnalyticsPage = () => {
                                     </AnimatedChart>
                                 </ResponsiveContainer>
                             ) : (
-                                <div style={emptyStateStyle}>{t('no_data', 'No data available')}</div>
+                                <div style={emptyStateStyle}>No data available</div>
                             )}
                         </div>
                     </div>
@@ -402,16 +400,16 @@ const AnalyticsPage = () => {
 
                 {/* SECTION 5: Driver Performance */}
                 <div style={cardStyle}>
-                    <h3 style={titleStyle}>{t('analytics.driver_performance', 'Driver Performance Ranking')}</h3>
+                    <h3 style={titleStyle}>Driver Performance Ranking</h3>
                     {sortedDrivers.length > 0 ? (
                         <div style={{ overflowX: 'auto' }}>
                             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
                                 <thead>
                                     <tr style={{ borderBottom: '1px solid #e2e8f0', color: '#64748b' }}>
-                                        <th style={{ padding: '12px 8px' }}>{t('name', 'Driver Name')}</th>
-                                        <th style={{ padding: '12px 8px' }}>{t('rating', 'Rating')}</th>
-                                        <th style={{ padding: '12px 8px' }}>{t('status', 'Status')}</th>
-                                        <th style={{ padding: '12px 8px' }}>{t('last_trip', 'Last Trip')}</th>
+                                        <th style={{ padding: '12px 8px' }}>Driver Name</th>
+                                        <th style={{ padding: '12px 8px' }}>Rating</th>
+                                        <th style={{ padding: '12px 8px' }}>Status</th>
+                                        <th style={{ padding: '12px 8px' }}>Last Trip</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -431,7 +429,7 @@ const AnalyticsPage = () => {
                                                     color: driver.status?.toLowerCase() === 'assigned' ? '#059669' :
                                                         driver.status?.toLowerCase() === 'available' ? '#2563eb' : '#64748b'
                                                 }}>
-                                                    {driver.status ? t(driver.status.toLowerCase(), driver.status) : t('offline', 'Offline')}
+                                                    {driver.status || 'Offline'}
                                                 </span>
                                             </td>
                                             <td style={{ padding: '12px 8px', color: '#64748b' }}>{driver.last_trip || 'N/A'}</td>
@@ -441,13 +439,13 @@ const AnalyticsPage = () => {
                             </table>
                         </div>
                     ) : (
-                        <div style={emptyStateStyle}>{t('no_data', 'No data available')}</div>
+                        <div style={emptyStateStyle}>No data available</div>
                     )}
                 </div>
 
                 {/* SECTION 6: Warehouse Events Timeline */}
                 <div style={cardStyle}>
-                    <h3 style={titleStyle}>{t('analytics.warehouse_events', 'Warehouse Events Log')}</h3>
+                    <h3 style={titleStyle}>Warehouse Events Log</h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                         {data.logs.length > 0 ? data.logs.map(log => {
                             let badgeColor = '#10b981'; // restored = green
@@ -460,10 +458,10 @@ const AnalyticsPage = () => {
                             }
 
                             // Calculate time ago safely
-                            let timeStr = t('just_now', 'Just now');
+                            let timeStr = 'Just now';
                             if (log.triggered_at) {
                                 const minutesAgo = Math.floor((new Date() - new Date(log.triggered_at)) / 60000);
-                                timeStr = minutesAgo < 60 ? t('mins_ago', { count: minutesAgo }) : t('hours_ago', { count: Math.floor(minutesAgo / 60) });
+                                timeStr = minutesAgo < 60 ? minutesAgo + ' mins ago' : Math.floor(minutesAgo / 60) + ' hours ago';
                             }
 
                             return (
@@ -475,7 +473,7 @@ const AnalyticsPage = () => {
                                                 padding: '2px 8px', borderRadius: '12px', fontWeight: 'bold',
                                                 textTransform: 'uppercase'
                                             }}>
-                                                {log.event_type ? t(log.event_type.toLowerCase(), log.event_type) : t('event', 'Event')}
+                                                {log.event_type || 'Event'}
                                             </span>
                                             <span style={{ color: '#64748b', fontSize: '0.8rem' }}>{timeStr}</span>
                                         </div>
@@ -484,7 +482,7 @@ const AnalyticsPage = () => {
                                 </div>
                             );
                         }) : (
-                            <div style={emptyStateStyle}>{t('no_data', 'No data available')}</div>
+                            <div style={emptyStateStyle}>No data available</div>
                         )}
                     </div>
                 </div>

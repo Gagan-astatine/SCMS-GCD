@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import supabase from '../config/SupabaseClient'; 
 import AIAssistant from '../components/AIAssistant';
-import { useTranslation } from 'react-i18next';
 
 const AIAssistancePage = () => {
-    const { t } = useTranslation();
-    const [stats, setStats] = useState({
+        const [stats, setStats] = useState({
         overflowing: 0,
         activeTrucks: 0,
         unassignedOrders: 0,
@@ -107,12 +105,12 @@ const AIAssistancePage = () => {
                 </div>
 
                 <div style={cardStyle}>
-                    <p style={{ margin: 0, color: '#64748b', fontSize: '0.85rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('cards.overflowing_now', 'Overflowing Warehouses')}</p>
+                    <p style={{ margin: 0, color: '#64748b', fontSize: '0.85rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Overflowing Warehouses</p>
                     <h3 style={{ margin: 0, color: stats.overflowing > 0 ? '#ef4444' : '#1e293b', fontSize: '2.5rem' }}>{stats.overflowing}</h3>
                 </div>
 
                 <div style={cardStyle}>
-                    <p style={{ margin: 0, color: '#64748b', fontSize: '0.85rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('cards.active_trucks', 'Active Trucks')}</p>
+                    <p style={{ margin: 0, color: '#64748b', fontSize: '0.85rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Active Trucks</p>
                     <h3 style={{ margin: 0, color: '#10b981', fontSize: '2.5rem' }}>{stats.activeTrucks}</h3>
                 </div>
 
@@ -122,7 +120,7 @@ const AIAssistancePage = () => {
                 </div>
 
                 <div style={cardStyle}>
-                    <p style={{ margin: 0, color: '#64748b', fontSize: '0.85rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('cards.available_drivers', 'Available Drivers')}</p>
+                    <p style={{ margin: 0, color: '#64748b', fontSize: '0.85rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Available Drivers</p>
                     <h3 style={{ margin: 0, color: '#3b82f6', fontSize: '2.5rem' }}>{stats.availableDrivers}</h3>
                 </div>
             </div>

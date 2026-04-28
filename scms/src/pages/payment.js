@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import supabase from "../config/SupabaseClient";
-import { useTranslation } from "react-i18next";
+
 
 const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 const Payment = () => {
-  const { t } = useTranslation();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -77,30 +76,30 @@ const Payment = () => {
       {/* Glassmorphic Card */}
       <div className="payment-card">
         <div className="payment-header">
-          <h2>{t('payment.secure_checkout', 'Secure Checkout')}</h2>
-          <p>{t('payment.complete_transaction', 'Complete your transaction securely')}</p>
+          <h2>Secure Checkout</h2>
+          <p>Complete your transaction securely</p>
         </div>
 
         <div className="payment-details">
           <div className="detail-row">
-            <span>{t('payment.invoice_id', 'Invoice ID')}</span>
+            <span>Invoice ID</span>
             <strong>#INV-9824-A</strong>
           </div>
           <div className="detail-row">
-            <span>{t('payment.service', 'Service')}</span>
-            <strong>{t('payment.service_name', 'Premium Freight Logistics')}</strong>
+            <span>Service</span>
+            <strong>Premium Freight Logistics</strong>
           </div>
           <div className="detail-row">
-            <span>{t('payment.subtotal', 'Subtotal')}</span>
+            <span>Subtotal</span>
             <strong>₹420.00</strong>
           </div>
           <div className="detail-row">
-            <span>{t('payment.taxes', 'Taxes & Fees')}</span>
+            <span>Taxes & Fees</span>
             <strong>₹80.00</strong>
           </div>
           <div className="divider"></div>
           <div className="detail-row total-row">
-            <span>{t('payment.total_amount', 'Total Amount')}</span>
+            <span>Total Amount</span>
             <strong className="total-amount">₹500.00</strong>
           </div>
         </div>
@@ -110,11 +109,11 @@ const Payment = () => {
             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
           </svg>
-          {t('payment.pay_via_razorpay', 'Pay Securely via Razorpay')}
+          Pay Securely via Razorpay
         </button>
 
         <div className="payment-footer">
-          <p>{t('payment.encryption_notice', 'Secured with AES-256 bit encryption')}</p>
+          <p>Secured with AES-256 bit encryption</p>
         </div>
       </div>
     </div>

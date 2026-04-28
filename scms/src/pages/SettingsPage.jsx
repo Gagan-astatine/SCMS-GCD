@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import supabase from '../config/SupabaseClient';
 
 const SettingsPage = () => {
-    const { t } = useTranslation();
     const [notifications, setNotifications] = useState({
         email: true,
         push: true,
@@ -114,17 +112,17 @@ const SettingsPage = () => {
 
     return (
         <div style={containerStyle}>
-            <h1 style={{ margin: '0 0 24px 0', color: '#000000' }}>{t('navigation.settings', 'Settings')}</h1>
+            <h1 style={{ margin: '0 0 24px 0', color: '#000000' }}>Settings</h1>
 
             {/* Profile Information */}
             <div style={sectionStyle}>
-                <h2 style={titleStyle}>{t('settings.profile', 'Profile Information')}</h2>
+                <h2 style={titleStyle}>Profile Information</h2>
                 {loading ? (
                     <p style={{ color: '#64748b' }}>Loading profile...</p>
                 ) : (
                     <>
                         <div style={rowStyle}>
-                            <span style={labelStyle}>{t('settings.name', 'Full Name')}</span>
+                            <span style={labelStyle}>Full Name</span>
                             {isEditingName ? (
                                 <div style={{ display: 'flex', gap: '8px' }}>
                                     <input 
@@ -145,11 +143,11 @@ const SettingsPage = () => {
                             )}
                         </div>
                         <div style={rowStyle}>
-                            <span style={labelStyle}>{t('settings.email', 'Email Address')}</span>
+                            <span style={labelStyle}>Email Address</span>
                             <span style={{ color: '#64748b' }}>{profile.email}</span>
                         </div>
                         <div style={{ ...rowStyle, borderBottom: 'none' }}>
-                            <span style={labelStyle}>{t('settings.role', 'Account Role')}</span>
+                            <span style={labelStyle}>Account Role</span>
                             <span style={{ color: '#f97316', fontWeight: 'bold', textTransform: 'capitalize' }}>{profile.role || 'Unknown'}</span>
                         </div>
                     </>
@@ -158,21 +156,21 @@ const SettingsPage = () => {
 
             {/* Notification Preferences */}
             <div style={sectionStyle}>
-                <h2 style={titleStyle}>{t('settings.notifications', 'Notification Preferences')}</h2>
+                <h2 style={titleStyle}>Notification Preferences</h2>
                 <div style={rowStyle}>
-                    <span style={labelStyle}>{t('settings.email_notif', 'Email Notifications')}</span>
+                    <span style={labelStyle}>Email Notifications</span>
                     <button style={toggleBtnStyle(notifications.email)} onClick={() => toggleNotification('email')}>
                         <div style={toggleCircleStyle(notifications.email)}></div>
                     </button>
                 </div>
                 <div style={rowStyle}>
-                    <span style={labelStyle}>{t('settings.push_notif', 'Push Notifications')}</span>
+                    <span style={labelStyle}>Push Notifications</span>
                     <button style={toggleBtnStyle(notifications.push)} onClick={() => toggleNotification('push')}>
                         <div style={toggleCircleStyle(notifications.push)}></div>
                     </button>
                 </div>
                 <div style={{ ...rowStyle, borderBottom: 'none' }}>
-                    <span style={labelStyle}>{t('settings.sms_notif', 'SMS Alerts')}</span>
+                    <span style={labelStyle}>SMS Alerts</span>
                     <button style={toggleBtnStyle(notifications.sms)} onClick={() => toggleNotification('sms')}>
                         <div style={toggleCircleStyle(notifications.sms)}></div>
                     </button>
@@ -181,15 +179,15 @@ const SettingsPage = () => {
 
             {/* Security Settings */}
             <div style={sectionStyle}>
-                <h2 style={titleStyle}>{t('settings.security', 'Security')}</h2>
+                <h2 style={titleStyle}>Security</h2>
                 <div style={rowStyle}>
-                    <span style={labelStyle}>{t('settings.password', 'Password')}</span>
+                    <span style={labelStyle}>Password</span>
                     <button style={{ backgroundColor: 'transparent', border: '1px solid #cbd5e1', padding: '6px 12px', borderRadius: '6px', color: '#64748b', cursor: 'pointer', fontWeight: '500' }}>
                         Change Password
                     </button>
                 </div>
                 <div style={{ ...rowStyle, borderBottom: 'none' }}>
-                    <span style={labelStyle}>{t('settings.two_factor', 'Two-Factor Authentication')}</span>
+                    <span style={labelStyle}>Two-Factor Authentication</span>
                     <span style={{ color: '#10b981', fontWeight: 'bold', fontSize: '0.9rem' }}>Enabled</span>
                 </div>
             </div>

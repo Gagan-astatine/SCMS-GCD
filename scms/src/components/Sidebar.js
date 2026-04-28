@@ -1,33 +1,30 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import useWarehouseMonitor from '../hooks/useWarehouseMonitor';
-import { useTranslation } from 'react-i18next';
-import LanguageSwitcher from './LanguageSwitcher';
 import supabase from '../config/SupabaseClient';
 
 const Sidebar = () => {
   const { overflowing } = useWarehouseMonitor();
-  const { t } = useTranslation();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
   };
 
   const navLinks = [
-    { to: "/orders", label: t('navigation.orders', 'Orders') },
-    { to: "/analytics", label: t('navigation.analytics', 'Analytics') },
-    { to: "/map", label: t('navigation.map_view', 'Map View') },
+    { to: "/orders", label: 'Orders' },
+    { to: "/analytics", label: 'Analytics' },
+    { to: "/map", label: 'Map View' },
     {
       to: "/warehouse",
-      label: t('navigation.warehouse', 'Warehouse'),
+      label: 'Warehouse',
       badge: overflowing.length > 0 ? `${overflowing.length} ⚠️` : null
     },
-    { to: "/Fleet", label: t('navigation.fleet', 'Fleet') },
-    { to: "/Dispatch", label: t('navigation.dispatch', 'Dispatch') },
-    { to: "/drivers", label: t('navigation.drivers', 'Drivers') },
-    { to: "/ai-assistance", label: t('navigation.ai_assistance', 'AI Assistance') },
-    { to: "/settings", label: t('navigation.settings', 'Settings') },
+    { to: "/Fleet", label: 'Fleet' },
+    { to: "/Dispatch", label: 'Dispatch' },
+    { to: "/drivers", label: 'Drivers' },
+    { to: "/ai-assistance", label: 'AI Assistance' },
+    { to: "/settings", label: 'Settings' },
   ];
 
   return (
@@ -76,10 +73,9 @@ const Sidebar = () => {
         <div className="top-navbar-right">
 
 
-          <div className="language-switcher-container" style={{ width: '160px' }}>
-            <LanguageSwitcher placement="bottom" />
-          </div>
+          
 
+          <div id="google_translate_element"></div>
           <button onClick={handleLogout} className="btn-logout-nav">
             Logout
           </button>

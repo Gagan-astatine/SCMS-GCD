@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import supabase from '../config/SupabaseClient';
 
 const DriverSidebar = () => {
-  const { t } = useTranslation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -12,10 +10,10 @@ const DriverSidebar = () => {
   };
 
   const navLinks = [
-    { to: "/orders", label: t('navigation.assigned_loads') },
-    { to: "/map", label: t('navigation.tracking') },
-    { to: "/driver/earnings", label: t('navigation.earnings') },
-    { to: "/settings", label: t('navigation.settings') }
+    { to: "/orders", label: 'Assigned Loads' },
+    { to: "/map", label: 'Tracking' },
+    { to: "/driver/earnings", label: 'Earnings' },
+    { to: "/settings", label: 'Settings' }
   ];
 
   return (
@@ -49,8 +47,9 @@ const DriverSidebar = () => {
 
         {/* Right: Actions */}
         <div className="top-navbar-right">
+          <div id="google_translate_element"></div>
           <button onClick={handleLogout} className="btn-logout-nav">
-            {t('navigation.logout')}
+            Logout
           </button>
         </div>
       </header>
@@ -87,7 +86,7 @@ const DriverSidebar = () => {
             marginTop: 'auto'
           }}
         >
-          {t('navigation.logout')}
+          Logout
         </button>
       </nav>
     </>
