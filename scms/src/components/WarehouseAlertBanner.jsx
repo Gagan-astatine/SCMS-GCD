@@ -55,7 +55,7 @@ const WarehouseAlertBanner = () => {
     return (
         <div style={{
             position: 'fixed',
-            top: '20px',
+            top: '11px',
             right: '20px',
             zIndex: 9999,
             display: 'flex',
