@@ -112,7 +112,7 @@ function App() {
 
     // 🏪 OWNER / SELLER (default)
     return (
-      <div className="app-layout">
+      <div className="app-layout top-nav-layout">
         <Sidebar />
         <main className="main-content">
           <Routes>
@@ -134,6 +134,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <img src="/IGNIS.png" alt="IGNIS Logo" className="splash-logo-global" />
       {session ? (
         <>
           <WarehouseAlertBanner />

@@ -177,19 +177,19 @@ const AIAssistant = () => {
             display: 'flex',
             flexDirection: 'column',
             height: '100%',
-            backgroundColor: '#0f172a',
+            backgroundColor: '#f8fafc',
             fontFamily: 'system-ui, -apple-system, sans-serif',
-            color: '#e2e8f0',
-            borderLeft: '1px solid #1e293b'
+            color: '#1e293b',
+            borderLeft: '1px solid #e2e8f0'
         }}>
             {/* Top Bar */}
             <div style={{
                 padding: '16px 24px',
-                borderBottom: '1px solid #1e293b',
+                borderBottom: '1px solid #e2e8f0',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '12px',
-                backgroundColor: '#1e293b'
+                backgroundColor: '#ffffff'
             }}>
                 <div style={{
                     width: '10px',
@@ -198,7 +198,7 @@ const AIAssistant = () => {
                     borderRadius: '50%',
                     boxShadow: '0 0 8px #22c55e'
                 }} />
-                <h2 style={{ margin: 0, fontSize: '1.2rem', color: 'white' }}>{t('ai.ai_copilot', 'AI Co-Pilot')}</h2>
+                <h2 style={{ margin: 0, fontSize: '1.2rem', color: '#0f172a' }}>{t('ai.ai_copilot', 'AI Co-Pilot')}</h2>
             </div>
 
             {/* Messages Area */}
@@ -229,7 +229,7 @@ const AIAssistant = () => {
                                     width: '32px',
                                     height: '32px',
                                     borderRadius: '50%',
-                                    backgroundColor: '#3b82f6',
+                                    backgroundColor: '#f97316',
                                     display: 'flex',
                                     justifyContent: 'center',
                                     alignItems: 'center',
@@ -242,15 +242,16 @@ const AIAssistant = () => {
 
                             {/* Bubble */}
                             <div style={{
-                                backgroundColor: msg.role === 'user' ? '#3b82f6' : (msg.isError ? '#7f1d1d' : '#1e293b'),
+                                backgroundColor: msg.role === 'user' ? '#f97316' : (msg.isError ? '#fef2f2' : '#ffffff'),
                                 padding: '12px 16px',
                                 borderRadius: '12px',
                                 borderTopLeftRadius: msg.role === 'ai' ? '2px' : '12px',
                                 borderTopRightRadius: msg.role === 'user' ? '2px' : '12px',
-                                color: 'white',
+                                color: msg.role === 'user' ? 'white' : (msg.isError ? '#ef4444' : '#1e293b'),
                                 fontSize: '0.95rem',
                                 lineHeight: '1.5',
-                                boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                                boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
+                                border: msg.role === 'ai' ? '1px solid #e2e8f0' : 'none',
                                 wordBreak: 'break-word'
                             }}>
                                 {formatMessageText(msg.text)}
@@ -259,7 +260,7 @@ const AIAssistant = () => {
                         {/* Timestamp */}
                         <span style={{
                             fontSize: '0.75rem',
-                            color: '#64748b',
+                            color: '#94a3b8',
                             marginTop: '6px',
                             marginRight: msg.role === 'user' ? '4px' : '0',
                             marginLeft: msg.role === 'ai' ? '44px' : '0'
@@ -273,14 +274,14 @@ const AIAssistant = () => {
                 {loading && (
                     <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
                         <div style={{
-                            width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#3b82f6',
+                            width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#f97316',
                             display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0, fontSize: '18px'
                         }}>
                             🤖
                         </div>
                         <div style={{
-                            backgroundColor: '#1e293b', padding: '16px', borderRadius: '12px', borderTopLeftRadius: '2px',
-                            display: 'flex', gap: '6px', alignItems: 'center'
+                            backgroundColor: '#ffffff', padding: '16px', borderRadius: '12px', borderTopLeftRadius: '2px',
+                            display: 'flex', gap: '6px', alignItems: 'center', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.05)'
                         }}>
                             <div className="typing-dot" style={{ animationDelay: '0s' }}></div>
                             <div className="typing-dot" style={{ animationDelay: '0.2s' }}></div>
@@ -295,8 +296,8 @@ const AIAssistant = () => {
             {/* Bottom Input Area */}
             <div style={{
                 padding: '20px',
-                backgroundColor: '#1e293b',
-                borderTop: '1px solid #334155',
+                backgroundColor: '#ffffff',
+                borderTop: '1px solid #e2e8f0',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '16px'
@@ -309,8 +310,8 @@ const AIAssistant = () => {
                             onClick={() => handleSend(s)}
                             style={{
                                 backgroundColor: 'transparent',
-                                border: '1px solid #3b82f6',
-                                color: '#60a5fa',
+                                border: '1px solid #f97316',
+                                color: '#f97316',
                                 padding: '6px 12px',
                                 borderRadius: '16px',
                                 fontSize: '0.8rem',
@@ -319,12 +320,12 @@ const AIAssistant = () => {
                                 whiteSpace: 'nowrap'
                             }}
                             onMouseOver={(e) => {
-                                e.target.style.backgroundColor = '#3b82f6';
+                                e.target.style.backgroundColor = '#f97316';
                                 e.target.style.color = 'white';
                             }}
                             onMouseOut={(e) => {
                                 e.target.style.backgroundColor = 'transparent';
-                                e.target.style.color = '#60a5fa';
+                                e.target.style.color = '#f97316';
                             }}
                         >
                             {s}
@@ -342,23 +343,23 @@ const AIAssistant = () => {
                         placeholder={t('ai.ask_supply_chain', "Ask about your supply chain...")}
                         style={{
                             flex: 1,
-                            backgroundColor: '#0f172a',
-                            border: '1px solid #334155',
+                            backgroundColor: '#f8fafc',
+                            border: '1px solid #cbd5e1',
                             padding: '12px 16px',
                             borderRadius: '8px',
-                            color: 'white',
+                            color: '#1e293b',
                             fontSize: '0.95rem',
                             outline: 'none',
                             transition: 'border-color 0.2s'
                         }}
-                        onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                        onBlur={(e) => e.target.style.borderColor = '#334155'}
+                        onFocus={(e) => e.target.style.borderColor = '#f97316'}
+                        onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
                     />
                     <button
                         onClick={() => handleSend()}
                         disabled={loading || !input.trim()}
                         style={{
-                            backgroundColor: (loading || !input.trim()) ? '#475569' : '#3b82f6',
+                            backgroundColor: (loading || !input.trim()) ? '#cbd5e1' : '#f97316',
                             color: 'white',
                             border: 'none',
                             padding: '0 24px',

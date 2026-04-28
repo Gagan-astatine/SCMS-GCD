@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 const BuyerSidebar = () => {
   return (
     <div className="sidebar">
-      <div className="sidebar-header">
+      <div className="sidebar-header" style={{ paddingLeft: '70px' }}>
         <h2>Buyer Portal</h2>
         <p>Purchasing Control</p>
       </div>

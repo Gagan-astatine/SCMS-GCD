@@ -98,7 +98,7 @@ const WarehouseAlertBanner = () => {
                     position: 'absolute',
                     top: '-4px',
                     right: '-4px',
-                    backgroundColor: '#ef4444',
+                    backgroundColor: '#f97316',
                     color: 'white',
                     fontSize: '12px',
                     fontWeight: 'bold',
@@ -128,9 +128,9 @@ const WarehouseAlertBanner = () => {
                 }}>
                     {alerts.map((alert) => (
                         <div key={alert.id} style={{
-                            backgroundColor: '#fef2f2',
-                            border: '1px solid #fecaca',
-                            borderLeft: '4px solid #ef4444',
+                            backgroundColor: '#fff7ed',
+                            border: '1px solid #fed7aa',
+                            borderLeft: '4px solid #f97316',
                             borderRadius: '6px',
                             padding: '12px 14px',
                             boxShadow: '0 8px 16px rgba(0, 0, 0, 0.15)',
@@ -139,13 +139,13 @@ const WarehouseAlertBanner = () => {
                         }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                 <div>
-                                    <h4 style={{ margin: '0 0 4px 0', color: '#b91c1c', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                    <h4 style={{ margin: '0 0 4px 0', color: '#c2410c', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
                                         <span>⚠️</span> Overflow: {alert.warehouseName}
                                     </h4>
-                                    <p style={{ margin: '0 0 2px 0', color: '#7f1d1d', fontSize: '0.85rem' }}>
-                                        Fill: <span style={{ color: '#ef4444', fontWeight: 'bold' }}>{alert.fillPercent}%</span>
+                                    <p style={{ margin: '0 0 2px 0', color: '#7c2d12', fontSize: '0.85rem' }}>
+                                        Fill: <span style={{ color: '#f97316', fontWeight: 'bold' }}>{alert.fillPercent}%</span>
                                     </p>
-                                    <p style={{ margin: '0', color: '#7f1d1d', fontSize: '0.85rem' }}>
+                                    <p style={{ margin: '0', color: '#7c2d12', fontSize: '0.85rem' }}>
                                         Alternate: {alert.alternateSuggested}
                                     </p>
                                 </div>
@@ -156,8 +156,8 @@ const WarehouseAlertBanner = () => {
                                     onClick={() => handleDismiss(alert.id)}
                                     style={{
                                         backgroundColor: 'transparent',
-                                        border: '1px solid #fca5a5',
-                                        color: '#ef4444',
+                                        border: '1px solid #fdba74',
+                                        color: '#f97316',
                                         padding: '4px 10px',
                                         borderRadius: '4px',
                                         cursor: 'pointer',
@@ -165,7 +165,7 @@ const WarehouseAlertBanner = () => {
                                         fontSize: '0.8rem',
                                         transition: 'background-color 0.2s'
                                     }}
-                                    onMouseOver={(e) => e.target.style.backgroundColor = '#fee2e2'}
+                                    onMouseOver={(e) => e.target.style.backgroundColor = '#ffedd5'}
                                     onMouseOut={(e) => e.target.style.backgroundColor = 'transparent'}
                                 >
                                     Dismiss
@@ -173,7 +173,7 @@ const WarehouseAlertBanner = () => {
                                 <button 
                                     onClick={() => handleAccept(alert)}
                                     style={{
-                                        backgroundColor: '#ef4444',
+                                        backgroundColor: '#f97316',
                                         border: 'none',
                                         color: 'white',
                                         padding: '4px 10px',
@@ -181,11 +181,11 @@ const WarehouseAlertBanner = () => {
                                         cursor: 'pointer',
                                         fontWeight: '600',
                                         fontSize: '0.8rem',
-                                        boxShadow: '0 2px 4px rgba(239, 68, 68, 0.3)',
+                                        boxShadow: '0 2px 4px rgba(249, 115, 22, 0.3)',
                                         transition: 'background-color 0.2s, transform 0.1s'
                                     }}
-                                    onMouseOver={(e) => e.target.style.backgroundColor = '#dc2626'}
-                                    onMouseOut={(e) => e.target.style.backgroundColor = '#ef4444'}
+                                    onMouseOver={(e) => e.target.style.backgroundColor = '#ea580c'}
+                                    onMouseOut={(e) => e.target.style.backgroundColor = '#f97316'}
                                     onMouseDown={(e) => e.target.style.transform = 'scale(0.97)'}
                                     onMouseUp={(e) => e.target.style.transform = 'scale(1)'}
                                 >
