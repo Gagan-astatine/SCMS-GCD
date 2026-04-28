@@ -18,8 +18,8 @@ const Sidebar = () => {
     { to: "/orders", label: t('navigation.orders', 'Orders') },
     { to: "/analytics", label: t('navigation.analytics', 'Analytics') },
     { to: "/map", label: t('navigation.map_view', 'Map View') },
-    { 
-      to: "/warehouse", 
+    {
+      to: "/warehouse",
       label: t('navigation.warehouse', 'Warehouse'),
       badge: overflowing.length > 0 ? `${overflowing.length} ⚠️` : null
     },
@@ -35,8 +35,8 @@ const Sidebar = () => {
       <header className="top-navbar">
         {/* Left: Brand Name & Hamburger */}
         <div className="top-navbar-left">
-          <button 
-            className="hamburger-menu" 
+          <button
+            className="hamburger-menu"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             ☰
@@ -49,19 +49,19 @@ const Sidebar = () => {
         {/* Center: Desktop Nav Links */}
         <nav className="top-nav-links">
           {navLinks.map((link, index) => (
-            <NavLink 
-              key={index} 
-              to={link.to} 
+            <NavLink
+              key={index}
+              to={link.to}
               className={({ isActive }) => "top-nav-item" + (isActive ? " active" : "")}
             >
               <span>{link.label}</span>
               {link.badge && (
-                <span style={{ 
-                  backgroundColor: '#f97316', 
-                  color: 'white', 
-                  fontSize: '0.75rem', 
-                  padding: '2px 8px', 
-                  borderRadius: '12px', 
+                <span style={{
+                  backgroundColor: '#f97316',
+                  color: 'white',
+                  fontSize: '0.75rem',
+                  padding: '2px 8px',
+                  borderRadius: '12px',
                   marginLeft: '6px',
                   fontWeight: 'bold'
                 }}>
@@ -74,26 +74,8 @@ const Sidebar = () => {
 
         {/* Right: Actions */}
         <div className="top-navbar-right">
-          {/* Notification Bell Placeholder */}
-          <div style={{ position: 'relative', cursor: 'pointer', fontSize: '1.2rem', padding: '8px' }}>
-            🔔
-            {overflowing.length > 0 && (
-              <span style={{
-                position: 'absolute',
-                top: '0px',
-                right: '0px',
-                backgroundColor: '#f97316',
-                color: 'white',
-                fontSize: '0.6rem',
-                padding: '2px 5px',
-                borderRadius: '50%',
-                fontWeight: 'bold'
-              }}>
-                {overflowing.length}
-              </span>
-            )}
-          </div>
-          
+
+
           <div className="language-switcher-container" style={{ width: '160px' }}>
             <LanguageSwitcher placement="bottom" />
           </div>
@@ -105,7 +87,7 @@ const Sidebar = () => {
       </header>
 
       {/* Mobile Drawer Overlay */}
-      <div 
+      <div
         className={`mobile-drawer-overlay ${isMobileMenuOpen ? 'open' : ''}`}
         onClick={() => setIsMobileMenuOpen(false)}
       ></div>
@@ -113,20 +95,20 @@ const Sidebar = () => {
       {/* Mobile Drawer */}
       <nav className={`mobile-drawer ${isMobileMenuOpen ? 'open' : ''}`}>
         {navLinks.map((link, index) => (
-          <NavLink 
-            key={index} 
-            to={link.to} 
+          <NavLink
+            key={index}
+            to={link.to}
             onClick={() => setIsMobileMenuOpen(false)}
             className={({ isActive }) => "top-nav-item" + (isActive ? " active" : "")}
           >
             <span>{link.label}</span>
             {link.badge && (
-              <span style={{ 
-                backgroundColor: '#f97316', 
-                color: 'white', 
-                fontSize: '0.75rem', 
-                padding: '2px 8px', 
-                borderRadius: '12px', 
+              <span style={{
+                backgroundColor: '#f97316',
+                color: 'white',
+                fontSize: '0.75rem',
+                padding: '2px 8px',
+                borderRadius: '12px',
                 marginLeft: 'auto',
                 fontWeight: 'bold'
               }}>

@@ -617,7 +617,7 @@ code {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
+  padding: 0 80px 0 20px; /* Right padding 80px to leave room for the fixed alert bell */
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   border-bottom: 1px solid #e2e8f0;
   height: 70px;
@@ -784,7 +784,7 @@ code {
 
 @media (max-width: 600px) {
   .top-navbar {
-    padding: 0 10px;
+    padding: 0 60px 0 10px;
   }
   .top-navbar-brand {
     margin-left: 50px; /* Compress margin for splash logo */
@@ -806,6 +806,7 @@ code {
     width: 45px !important;
     height: 45px !important;
     top: 15px !important;
+    left: 45px !important;
   }
 }
 
