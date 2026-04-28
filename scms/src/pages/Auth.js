@@ -56,11 +56,11 @@ const Auth = () => {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h2>{isLogin ? 'Welcome Back' : 'Create an Account'}</h2>
+        <h2>{isLogin ? 'Access Your Intelligence Core' : 'Initialize Your Core'}</h2>
         <p className="auth-subtitle">
           {isLogin
-            ? 'Enter your details to access the system.'
-            : 'Sign up to start managing your logistics.'}
+            ? 'Sign in to manage your knowledge base and unlock AI-powered analysis'
+            : 'Sign up to build your secure logistics intelligence network'}
         </p>
 
         {error && <p className="auth-error">{error}</p>}
@@ -69,12 +69,12 @@ const Auth = () => {
         <form onSubmit={handleSubmit} className="auth-form">
           {!isLogin && (
             <div className="input-group">
-              <label htmlFor="role">I am a...</label>
+              <label htmlFor="role">Account Type</label>
               <select
                 id="role"
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                style={{ padding: '12px 16px', borderRadius: '10px', border: '1px solid #cbd5e1', outline: 'none' }}
+                className="auth-input"
               >
                 <option value="seller">Seller</option>
                 <option value="buyer">Buyer</option>
@@ -84,13 +84,14 @@ const Auth = () => {
           )}
 
           <div className="input-group">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">Email Address</label>
             <input
               type="email"
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
+              placeholder="enter your email"
+              className="auth-input"
               required
             />
           </div>
@@ -102,13 +103,14 @@ const Auth = () => {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
+              placeholder="enter your password"
+              className="auth-input"
               required
             />
           </div>
 
           <button type="submit" className="auth-button" disabled={loading}>
-            {loading ? 'Processing...' : (isLogin ? 'Sign In' : 'Sign Up')}
+            {loading ? 'Processing...' : (isLogin ? 'Continue With Mail ➔' : 'Create Account ➔')}
           </button>
         </form>
 
@@ -117,6 +119,9 @@ const Auth = () => {
           <span onClick={() => setIsLogin(!isLogin)}>
             {isLogin ? 'Sign Up' : 'Sign In'}
           </span>
+        </p>
+        <p className="auth-encryption-notice">
+          Your data is encrypted and secure. We never share your information with third parties.
         </p>
       </div>
     </div>

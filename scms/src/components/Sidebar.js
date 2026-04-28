@@ -117,6 +117,22 @@ const Sidebar = () => {
             )}
           </NavLink>
         ))}
+        <button
+          onClick={handleLogout}
+          style={{
+            margin: 'auto 24px 24px 24px',
+            backgroundColor: '#f97316',
+            color: 'white',
+            border: 'none',
+            padding: '12px 16px',
+            borderRadius: '8px',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            marginTop: 'auto'
+          }}
+        >
+          Logout
+        </button>
       </nav>
     </>
   );

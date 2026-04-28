@@ -6,6 +6,27 @@ import {
 } from 'recharts';
 import { useTranslation } from 'react-i18next';
 
+const AnimatedChart = ({ children }) => {
+    const [isVisible, setIsVisible] = useState(false);
+    const domRef = React.useRef();
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    setIsVisible(true);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        if (domRef.current) observer.observe(domRef.current);
+        return () => observer.disconnect();
+    }, []);
+
+    return <div ref={domRef} style={{ width: '100%', height: '100%' }}>{isVisible ? children : null}</div>;
+};
+
 const AnalyticsPage = () => {
     const { t, i18n } = useTranslation();
     const [data, setData] = useState({
@@ -114,7 +135,7 @@ const AnalyticsPage = () => {
 
     if (loading) {
         return (
-            <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#0f172a', color: 'white' }}>
+            <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8fafc', color: '#1e293b' }}>
                 <h2>{t('loading', 'Loading Analytics...')}</h2>
             </div>
         );
@@ -138,16 +159,13 @@ const AnalyticsPage = () => {
     // SECTION 2
     const warehouseCapacityData = data.warehouses.map(w => {
         const fillPercent = Math.round(((w.current_load + (w.reserved_space || 0)) / (w.max_capacity || 1)) * 100);
-        let color = '#22c55e'; // green
-        if (fillPercent > 85) color = '#ef4444'; // red
-        else if (fillPercent >= 60) color = '#f59e0b'; // amber
 
         return {
             name: t(w.name?.toLowerCase(), w.name || 'Unknown'),
             fillPercent,
             current_load: w.current_load || 0,
             max_capacity: w.max_capacity || 0,
-            color
+            colorId: fillPercent > 85 ? 'colorRed' : fillPercent >= 60 ? 'colorOrange' : 'colorGreen'
         };
     });
 
@@ -184,47 +202,49 @@ const AnalyticsPage = () => {
 
     // Reusable styles
     const cardStyle = {
-        backgroundColor: '#1e293b',
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
         borderRadius: '12px',
         padding: '24px',
-        boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
-        border: '1px solid #334155'
+        boxShadow: '0 4px 30px rgba(0, 0, 0, 0.05)',
+        border: '1px solid rgba(249, 115, 22, 0.3)'
     };
 
-    const titleStyle = { margin: '0 0 16px 0', fontSize: '1.1rem', color: '#f8fafc', fontWeight: '600' };
+    const titleStyle = { margin: '0 0 16px 0', fontSize: '1.1rem', color: '#f97316', fontWeight: '600', textTransform: 'uppercase' };
     const emptyStateStyle = { display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', color: '#64748b', fontStyle: 'italic', minHeight: '200px' };
 
     // Removed unused getStatusText
 
     return (
-        <div style={{ padding: '24px', backgroundColor: '#0f172a', minHeight: '100vh', color: '#e2e8f0', boxSizing: 'border-box' }}>
-            <h1 style={{ margin: '0 0 24px 0', color: 'white' }}>{t('analytics.dashboard', 'SCMS Analytics Dashboard')}</h1>
+        <div style={{ padding: '24px', backgroundColor: 'transparent', minHeight: '100vh', color: '#1e293b', boxSizing: 'border-box' }}>
+            <h1 style={{ margin: '0 0 24px 0', color: '#f97316', textTransform: 'uppercase' }}>{t('analytics.dashboard', 'SCMS Analytics Dashboard')}</h1>
 
             {/* SECTION 1: Top KPI Cards */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', marginBottom: '24px' }}>
                 <div style={cardStyle}>
-                    <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.9rem' }}>{t('cards.total_warehouses', 'Total Warehouses')}</p>
-                    <h2 style={{ margin: '8px 0 0 0', fontSize: '2rem', color: 'white' }}>{data.warehouses.length > 0 ? totalWarehouses.toLocaleString(i18n.language) : '-'}</h2>
+                    <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>{t('cards.total_warehouses', 'Total Warehouses')}</p>
+                    <h2 style={{ margin: '8px 0 0 0', fontSize: '2rem', color: '#1e293b' }}>{data.warehouses.length > 0 ? totalWarehouses.toLocaleString(i18n.language) : '-'}</h2>
                 </div>
                 <div style={cardStyle}>
-                    <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.9rem' }}>{t('cards.overflowing_now', 'Overflowing Warehouses')}</p>
-                    <h2 style={{ margin: '8px 0 0 0', fontSize: '2rem', color: overflowingWarehouses > 0 ? '#ef4444' : 'white' }}>{data.warehouses.length > 0 ? overflowingWarehouses.toLocaleString(i18n.language) : '-'}</h2>
+                    <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>{t('cards.overflowing_now', 'Overflowing Warehouses')}</p>
+                    <h2 style={{ margin: '8px 0 0 0', fontSize: '2rem', color: overflowingWarehouses > 0 ? '#ef4444' : '#1e293b' }}>{data.warehouses.length > 0 ? overflowingWarehouses.toLocaleString(i18n.language) : '-'}</h2>
                 </div>
                 <div style={cardStyle}>
-                    <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.9rem' }}>{t('cards.total_trucks', 'Total Trucks')}</p>
-                    <h2 style={{ margin: '8px 0 0 0', fontSize: '2rem', color: 'white' }}>{data.fleet.length > 0 ? totalTrucks.toLocaleString(i18n.language) : '-'}</h2>
+                    <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>{t('cards.total_trucks', 'Total Trucks')}</p>
+                    <h2 style={{ margin: '8px 0 0 0', fontSize: '2rem', color: '#1e293b' }}>{data.fleet.length > 0 ? totalTrucks.toLocaleString(i18n.language) : '-'}</h2>
                 </div>
                 <div style={cardStyle}>
-                    <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.9rem' }}>{t('cards.active_trucks', 'Active Trucks')}</p>
+                    <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>{t('cards.active_trucks', 'Active Trucks')}</p>
                     <h2 style={{ margin: '8px 0 0 0', fontSize: '2rem', color: '#10b981' }}>{data.fleet.length > 0 ? activeTrucks.toLocaleString(i18n.language) : '-'}</h2>
                 </div>
                 <div style={cardStyle}>
-                    <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.9rem' }}>{t('cards.total_orders', 'Total Orders')}</p>
-                    <h2 style={{ margin: '8px 0 0 0', fontSize: '2rem', color: 'white' }}>{data.orders.length > 0 ? totalOrders.toLocaleString(i18n.language) : '-'}</h2>
+                    <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>{t('cards.total_orders', 'Total Orders')}</p>
+                    <h2 style={{ margin: '8px 0 0 0', fontSize: '2rem', color: '#1e293b' }}>{data.orders.length > 0 ? totalOrders.toLocaleString(i18n.language) : '-'}</h2>
                 </div>
                 <div style={cardStyle}>
-                    <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.9rem' }}>{t('cards.total_drivers', 'Total Drivers')}</p>
-                    <h2 style={{ margin: '8px 0 0 0', fontSize: '2rem', color: 'white' }}>{data.drivers.length > 0 ? totalDrivers.toLocaleString(i18n.language) : '-'}</h2>
+                    <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>{t('cards.total_drivers', 'Total Drivers')}</p>
+                    <h2 style={{ margin: '8px 0 0 0', fontSize: '2rem', color: '#1e293b' }}>{data.drivers.length > 0 ? totalDrivers.toLocaleString(i18n.language) : '-'}</h2>
                 </div>
             </div>
 
@@ -237,20 +257,44 @@ const AnalyticsPage = () => {
                     <div style={{ width: '100%', height: 300 }}>
                         {warehouseCapacityData.length > 0 ? (
                             <ResponsiveContainer>
-                                <BarChart data={warehouseCapacityData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
-                                    <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickFormatter={(val) => val.split(' ')[0]} />
-                                    <YAxis stroke="#94a3b8" fontSize={12} />
-                                    <Tooltip
-                                        contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: '8px' }}
-                                        formatter={(value, name, props) => [`${value.toLocaleString(i18n.language)}% (${props.payload.current_load.toLocaleString(i18n.language)}/${props.payload.max_capacity.toLocaleString(i18n.language)})`, t('warehouse.fill_percent', 'Filled')]}
-                                    />
-                                    <Bar dataKey="fillPercent" radius={[4, 4, 0, 0]}>
-                                        {warehouseCapacityData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={entry.color} />
-                                        ))}
-                                    </Bar>
-                                </BarChart>
+                                <AnimatedChart>
+                                    <BarChart data={warehouseCapacityData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                        <defs>
+                                            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                                                <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#000" floodOpacity="0.1" />
+                                                <feGaussianBlur stdDeviation="2" result="blur" />
+                                                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                                            </filter>
+                                            <linearGradient id="colorGreen" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="0%" stopColor="#86efac" stopOpacity={1}/>
+                                                <stop offset="40%" stopColor="#22c55e" stopOpacity={0.9}/>
+                                                <stop offset="100%" stopColor="#15803d" stopOpacity={0.8}/>
+                                            </linearGradient>
+                                            <linearGradient id="colorOrange" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="0%" stopColor="#fde047" stopOpacity={1}/>
+                                                <stop offset="40%" stopColor="#f97316" stopOpacity={0.9}/>
+                                                <stop offset="100%" stopColor="#c2410c" stopOpacity={0.8}/>
+                                            </linearGradient>
+                                            <linearGradient id="colorRed" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="0%" stopColor="#fca5a5" stopOpacity={1}/>
+                                                <stop offset="40%" stopColor="#ef4444" stopOpacity={0.9}/>
+                                                <stop offset="100%" stopColor="#b91c1c" stopOpacity={0.8}/>
+                                            </linearGradient>
+                                        </defs>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                                        <XAxis dataKey="name" stroke="#64748b" fontSize={12} tickFormatter={(val) => val.split(' ')[0]} />
+                                        <YAxis stroke="#64748b" fontSize={12} />
+                                        <Tooltip
+                                            contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', color: '#1e293b' }}
+                                            formatter={(value, name, props) => [`${value.toLocaleString(i18n.language)}% (${props.payload.current_load.toLocaleString(i18n.language)}/${props.payload.max_capacity.toLocaleString(i18n.language)})`, t('warehouse.fill_percent', 'Filled')]}
+                                        />
+                                        <Bar dataKey="fillPercent" radius={[6, 6, 0, 0]} isAnimationActive={true} animationDuration={1200} filter="url(#glow)">
+                                            {warehouseCapacityData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={`url(#${entry.colorId})`} />
+                                            ))}
+                                        </Bar>
+                                    </BarChart>
+                                </AnimatedChart>
                             </ResponsiveContainer>
                         ) : (
                             <div style={emptyStateStyle}>{t('no_data', 'No data available')}</div>
@@ -264,18 +308,37 @@ const AnalyticsPage = () => {
                     <div style={{ width: '100%', height: 300 }}>
                         {ioData.length > 0 ? (
                             <ResponsiveContainer>
-                                <BarChart data={ioData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
-                                    <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickFormatter={(val) => val?.split(' ')[0] || val} />
-                                    <YAxis stroke="#94a3b8" fontSize={12} />
-                                    <Tooltip
-                                        contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: '8px' }}
-                                        formatter={(value, name, props) => [`${value.toLocaleString(i18n.language)} (${t('warehouse.onhand', 'On hand')}: ${props.payload.onhand.toLocaleString(i18n.language)})`, name]}
-                                    />
-                                    <Legend wrapperStyle={{ fontSize: '12px' }} />
-                                    <Bar dataKey="inbound" name={t('inbound', 'Inbound')} fill="#3b82f6" radius={[2, 2, 0, 0]} />
-                                    <Bar dataKey="outbound" name={t('outbound', 'Outbound')} fill="#f59e0b" radius={[2, 2, 0, 0]} />
-                                </BarChart>
+                                <AnimatedChart>
+                                    <BarChart data={ioData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                        <defs>
+                                            <filter id="glowInOut" x="-20%" y="-20%" width="140%" height="140%">
+                                                <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#000" floodOpacity="0.1" />
+                                                <feGaussianBlur stdDeviation="2" result="blur" />
+                                                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                                            </filter>
+                                            <linearGradient id="colorInbound" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="0%" stopColor="#93c5fd" stopOpacity={1}/>
+                                                <stop offset="40%" stopColor="#3b82f6" stopOpacity={0.9}/>
+                                                <stop offset="100%" stopColor="#1d4ed8" stopOpacity={0.8}/>
+                                            </linearGradient>
+                                            <linearGradient id="colorOutbound" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="0%" stopColor="#fde047" stopOpacity={1}/>
+                                                <stop offset="40%" stopColor="#f97316" stopOpacity={0.9}/>
+                                                <stop offset="100%" stopColor="#c2410c" stopOpacity={0.8}/>
+                                            </linearGradient>
+                                        </defs>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                                        <XAxis dataKey="name" stroke="#64748b" fontSize={12} tickFormatter={(val) => val?.split(' ')[0] || val} />
+                                        <YAxis stroke="#64748b" fontSize={12} />
+                                        <Tooltip
+                                            contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', color: '#1e293b' }}
+                                            formatter={(value, name, props) => [`${value.toLocaleString(i18n.language)} (${t('warehouse.onhand', 'On hand')}: ${props.payload.onhand.toLocaleString(i18n.language)})`, name]}
+                                        />
+                                        <Legend wrapperStyle={{ fontSize: '12px', color: '#64748b' }} />
+                                        <Bar dataKey="inbound" name={t('inbound', 'Inbound')} fill="url(#colorInbound)" radius={[4, 4, 0, 0]} isAnimationActive={true} animationDuration={1200} filter="url(#glowInOut)" />
+                                        <Bar dataKey="outbound" name={t('outbound', 'Outbound')} fill="url(#colorOutbound)" radius={[4, 4, 0, 0]} isAnimationActive={true} animationDuration={1200} filter="url(#glowInOut)" />
+                                    </BarChart>
+                                </AnimatedChart>
                             </ResponsiveContainer>
                         ) : (
                             <div style={emptyStateStyle}>{t('no_data', 'No data available')}</div>
@@ -294,14 +357,16 @@ const AnalyticsPage = () => {
                         <div style={{ width: '100%', height: 250 }}>
                             {orderStatusData.length > 0 ? (
                                 <ResponsiveContainer>
-                                    <PieChart>
-                                        <Pie data={orderStatusData} cx="50%" cy="50%" outerRadius={80} dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
-                                            {orderStatusData.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
-                                            ))}
-                                        </Pie>
-                                        <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: '8px' }} />
-                                    </PieChart>
+                                    <AnimatedChart>
+                                        <PieChart>
+                                            <Pie data={orderStatusData} cx="50%" cy="50%" outerRadius={80} dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} isAnimationActive={true} animationDuration={1200}>
+                                                {orderStatusData.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                                                ))}
+                                            </Pie>
+                                            <Tooltip contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', color: '#1e293b' }} />
+                                        </PieChart>
+                                    </AnimatedChart>
                                 </ResponsiveContainer>
                             ) : (
                                 <div style={emptyStateStyle}>{t('no_data', 'No data available')}</div>
@@ -314,17 +379,19 @@ const AnalyticsPage = () => {
                         <div style={{ width: '100%', height: 250 }}>
                             {data.fleet.length > 0 ? (
                                 <ResponsiveContainer>
-                                    <PieChart>
-                                        <Pie data={fleetDonutData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} dataKey="value" label>
-                                            {fleetDonutData.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={DONUT_COLORS[index % DONUT_COLORS.length]} />
-                                            ))}
-                                        </Pie>
-                                        <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: '8px' }} />
-                                        <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fill="white" fontSize={24} fontWeight="bold">
-                                            {Math.round((activeTrucks / (totalTrucks || 1)) * 100)}%
-                                        </text>
-                                    </PieChart>
+                                    <AnimatedChart>
+                                        <PieChart>
+                                            <Pie data={fleetDonutData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} dataKey="value" label isAnimationActive={true} animationDuration={1200}>
+                                                {fleetDonutData.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={DONUT_COLORS[index % DONUT_COLORS.length]} />
+                                                ))}
+                                            </Pie>
+                                            <Tooltip contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', color: '#1e293b' }} />
+                                            <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fill="#1e293b" fontSize={24} fontWeight="bold">
+                                                {Math.round((activeTrucks / (totalTrucks || 1)) * 100)}%
+                                            </text>
+                                        </PieChart>
+                                    </AnimatedChart>
                                 </ResponsiveContainer>
                             ) : (
                                 <div style={emptyStateStyle}>{t('no_data', 'No data available')}</div>
@@ -340,7 +407,7 @@ const AnalyticsPage = () => {
                         <div style={{ overflowX: 'auto' }}>
                             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
                                 <thead>
-                                    <tr style={{ borderBottom: '1px solid #334155', color: '#94a3b8' }}>
+                                    <tr style={{ borderBottom: '1px solid #e2e8f0', color: '#64748b' }}>
                                         <th style={{ padding: '12px 8px' }}>{t('name', 'Driver Name')}</th>
                                         <th style={{ padding: '12px 8px' }}>{t('rating', 'Rating')}</th>
                                         <th style={{ padding: '12px 8px' }}>{t('status', 'Status')}</th>
@@ -349,25 +416,25 @@ const AnalyticsPage = () => {
                                 </thead>
                                 <tbody>
                                     {sortedDrivers.slice(0, 8).map(driver => (
-                                        <tr key={driver.driver_id || driver.id || Math.random()} style={{ borderBottom: '1px solid #334155' }}>
-                                            <td style={{ padding: '12px 8px', color: 'white' }}>{driver.name}</td>
+                                        <tr key={driver.driver_id || driver.id || Math.random()} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                                            <td style={{ padding: '12px 8px', color: '#1e293b', fontWeight: '500' }}>{driver.name}</td>
                                             <td style={{ padding: '12px 8px', color: '#f59e0b' }}>
                                                 {'★'.repeat(Math.floor(driver.rating || 0))}
-                                                <span style={{ color: '#475569' }}>{'★'.repeat(5 - Math.floor(driver.rating || 0))}</span>
-                                                <span style={{ marginLeft: '4px', color: '#94a3b8' }}>{driver.rating}</span>
+                                                <span style={{ color: '#cbd5e1' }}>{'★'.repeat(5 - Math.floor(driver.rating || 0))}</span>
+                                                <span style={{ marginLeft: '4px', color: '#64748b' }}>{driver.rating}</span>
                                             </td>
                                             <td style={{ padding: '12px 8px' }}>
                                                 <span style={{
                                                     padding: '4px 8px', borderRadius: '12px', fontSize: '0.8rem',
-                                                    backgroundColor: driver.status?.toLowerCase() === 'assigned' ? '#064e3b' :
-                                                        driver.status?.toLowerCase() === 'available' ? '#1e3a8a' : '#334155',
-                                                    color: driver.status?.toLowerCase() === 'assigned' ? '#34d399' :
-                                                        driver.status?.toLowerCase() === 'available' ? '#60a5fa' : '#94a3b8'
+                                                    backgroundColor: driver.status?.toLowerCase() === 'assigned' ? '#d1fae5' :
+                                                        driver.status?.toLowerCase() === 'available' ? '#dbeafe' : '#f1f5f9',
+                                                    color: driver.status?.toLowerCase() === 'assigned' ? '#059669' :
+                                                        driver.status?.toLowerCase() === 'available' ? '#2563eb' : '#64748b'
                                                 }}>
                                                     {driver.status ? t(driver.status.toLowerCase(), driver.status) : t('offline', 'Offline')}
                                                 </span>
                                             </td>
-                                            <td style={{ padding: '12px 8px', color: '#94a3b8' }}>{driver.last_trip || 'N/A'}</td>
+                                            <td style={{ padding: '12px 8px', color: '#64748b' }}>{driver.last_trip || 'N/A'}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -384,12 +451,12 @@ const AnalyticsPage = () => {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                         {data.logs.length > 0 ? data.logs.map(log => {
                             let badgeColor = '#10b981'; // restored = green
-                            let bgColor = '#064e3b';
+                            let bgColor = '#d1fae5';
 
                             if (log.event_type === 'overflow') {
-                                badgeColor = '#ef4444'; bgColor = '#7f1d1d';
+                                badgeColor = '#ef4444'; bgColor = '#fee2e2';
                             } else if (log.event_type === 'reroute') {
-                                badgeColor = '#f59e0b'; bgColor = '#78350f';
+                                badgeColor = '#f59e0b'; bgColor = '#fef3c7';
                             }
 
                             // Calculate time ago safely
@@ -412,7 +479,7 @@ const AnalyticsPage = () => {
                                             </span>
                                             <span style={{ color: '#64748b', fontSize: '0.8rem' }}>{timeStr}</span>
                                         </div>
-                                        <p style={{ margin: '0 0 4px 0', color: 'white', fontSize: '0.9rem' }}>{log.message || 'Unknown event occurred.'}</p>
+                                        <p style={{ margin: '0 0 4px 0', color: '#1e293b', fontSize: '0.9rem', fontWeight: '500' }}>{log.message || 'Unknown event occurred.'}</p>
                                     </div>
                                 </div>
                             );
