@@ -38,6 +38,7 @@ const LanguageSwitcher = ({ placement = 'top' }) => {
   return (
     <div ref={dropdownRef} style={{ position: 'relative', display: 'inline-block' }}>
       <button 
+        className="language-switcher-btn"
         onClick={() => setIsOpen(!isOpen)}
         style={{
           backgroundColor: '#0f172a',
@@ -49,7 +50,6 @@ const LanguageSwitcher = ({ placement = 'top' }) => {
           alignItems: 'center',
           gap: '8px',
           cursor: 'pointer',
-          minWidth: '160px',
           justifyContent: 'space-between',
           transition: 'background-color 0.2s',
         }}
@@ -57,8 +57,8 @@ const LanguageSwitcher = ({ placement = 'top' }) => {
         onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#0f172a'}
       >
         <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '1.1rem' }}>{currentLang.flag}</span>
-          <span style={{ fontSize: '0.9rem', fontWeight: '500' }}>{currentLang.name}</span>
+          <span className="language-flag">{currentLang.flag}</span>
+          <span className="language-name" style={{ fontSize: '0.9rem', fontWeight: '500' }}>{currentLang.name}</span>
         </span>
         <svg 
           width="16" 

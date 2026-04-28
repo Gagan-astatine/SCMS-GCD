@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import supabase from "./config/SupabaseClient";
 import "./App.css";
 
-import Home from "./pages/home";
+
 import Auth from "./pages/Auth";
 import Orders from "./pages/Orders";
 import BuyerDashboard from "./pages/BuyerDashboard";
@@ -16,6 +16,7 @@ import DriverSidebar from "./components/DriverSidebar";
 import WarehousePage from "./pages/WarehousePage"
 import AnalyticsPage from "./pages/AnalyticsPage";
 import AIAssistancePage from "./pages/AIAssistancePage";
+import SettingsPage from "./pages/SettingsPage";
 
 import Fleet from "./pages/fleet"
 import Dispatch from "./pages/dispatch"
@@ -116,7 +117,7 @@ function App() {
         <Sidebar />
         <main className="main-content">
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Navigate to="/orders" replace />} />
             <Route path="/orders" element={<Orders />} />
             <Route path="/analytics" element={<AnalyticsPage />} />
             <Route path="/warehouse" element={<WarehousePage />} />
@@ -125,7 +126,8 @@ function App() {
             <Route path="/drivers" element={<Driver />} />
             <Route path="/ai-assistance" element={<AIAssistancePage />} />
             <Route path="/map" element={<MapView />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="*" element={<Navigate to="/orders" replace />} />
           </Routes>
         </main>
       </div>
@@ -134,6 +136,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <div className="splash-overlay"></div>
       <img src="/IGNIS.png" alt="IGNIS Logo" className="splash-logo-global" />
       {session ? (
         <>

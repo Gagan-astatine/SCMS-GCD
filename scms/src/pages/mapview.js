@@ -76,7 +76,7 @@ const MapView = () => {
         <div className="page map-view" style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px', animation: 'fadeIn 0.5s ease-out' }}>
 
             <div className="map-title" style={{ marginBottom: '24px' }}>
-                <h2 style={{ fontSize: '2rem', color: '#0f172a', margin: '0', fontWeight: '800', letterSpacing: '-0.02em' }}>
+                <h2 style={{ fontSize: '2rem', color: '#f97316', margin: '0', fontWeight: '800', letterSpacing: '-0.02em', textTransform: 'uppercase' }}>
                     Live Fleet Tracking
                 </h2>
                 <p style={{ color: '#64748b', margin: '8px 0 0', fontSize: '1rem' }}>

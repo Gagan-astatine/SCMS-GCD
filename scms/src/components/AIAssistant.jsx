@@ -198,7 +198,7 @@ const AIAssistant = () => {
                     borderRadius: '50%',
                     boxShadow: '0 0 8px #22c55e'
                 }} />
-                <h2 style={{ margin: 0, fontSize: '1.2rem', color: '#0f172a' }}>{t('ai.ai_copilot', 'AI Co-Pilot')}</h2>
+                <h2 style={{ margin: 0, fontSize: '1.2rem', color: '#f97316', textTransform: 'uppercase' }}>{t('ai.ai_copilot', 'AI Co-Pilot')}</h2>
             </div>
 
             {/* Messages Area */}

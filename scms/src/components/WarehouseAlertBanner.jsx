@@ -67,6 +67,7 @@ const WarehouseAlertBanner = () => {
         }}>
             {/* Notification Bell Button */}
             <button 
+                className="alert-banner-btn"
                 onClick={() => setIsOpen(!isOpen)}
                 style={{
                     backgroundColor: 'white',
