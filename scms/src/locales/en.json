@@ -8,7 +8,18 @@
     "analytics": "Analytics",
     "ai_assistance": "AI Assistance",
     "settings": "Settings",
-    "dispatch": "Dispatch"
+    "dispatch": "Dispatch",
+    "assigned_loads": "Assigned Loads",
+    "tracking": "Tracking",
+    "earnings": "Earnings",
+    "driver_portal": "Driver Portal",
+    "delivery_routes": "Delivery Routes",
+    "logout": "Logout",
+    "my_purchases": "My Purchases",
+    "invoices": "Invoices",
+    "payments": "Payments",
+    "buyer_portal": "Buyer Portal",
+    "purchasing_control": "Purchasing Control"
   },
   "cards": {
     "total_warehouses": "Total Warehouses",

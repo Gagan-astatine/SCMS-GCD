@@ -6,8 +6,8 @@ import "./App.css";
 
 import Auth from "./pages/Auth";
 import Orders from "./pages/Orders";
-import BuyerDashboard from "./pages/BuyerDashboard";
-import DriverDashboard from "./pages/DriverDashboard";
+
+
 import Payment from "./pages/payment";
 
 import Sidebar from "./components/Sidebar";
@@ -83,13 +83,16 @@ function App() {
     // 🟢 BUYER
     if (role === "buyer") {
       return (
-        <div className="app-layout">
+        <div className="app-layout top-nav-layout">
           <BuyerSidebar />
           <main className="main-content">
             <Routes>
-              <Route path="/" element={<BuyerDashboard />} />
+              <Route path="/" element={<Navigate to="/orders" replace />} />
+              <Route path="/orders" element={<Orders />} />
               <Route path="/payments" element={<Payment />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
+              <Route path="/map" element={<MapView />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="*" element={<Navigate to="/orders" replace />} />
             </Routes>
           </main>
         </div>
@@ -99,12 +102,15 @@ function App() {
     // 🚚 DRIVER
     if (role === "driver") {
       return (
-        <div className="app-layout">
+        <div className="app-layout top-nav-layout">
           <DriverSidebar />
           <main className="main-content">
             <Routes>
-              <Route path="/" element={<DriverDashboard />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
+              <Route path="/" element={<Navigate to="/orders" replace />} />
+              <Route path="/orders" element={<Orders />} />
+              <Route path="/map" element={<MapView />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="*" element={<Navigate to="/orders" replace />} />
             </Routes>
           </main>
         </div>
@@ -113,7 +119,9 @@ function App() {
 
     // 🏪 OWNER / SELLER (default)
     return (
-      <div className="app-layout top-nav-layout">
+      <>
+        <WarehouseAlertBanner />
+        <div className="app-layout top-nav-layout">
         <Sidebar />
         <main className="main-content">
           <Routes>
@@ -131,6 +139,7 @@ function App() {
           </Routes>
         </main>
       </div>
+      </>
     );
   };
 
@@ -139,10 +148,7 @@ function App() {
       <div className="splash-overlay"></div>
       <img src="/IGNIS.png" alt="IGNIS Logo" className="splash-logo-global" />
       {session ? (
-        <>
-          <WarehouseAlertBanner />
-          {renderLayout()}
-        </>
+        renderLayout()
       ) : (
         <Routes>
           <Route path="*" element={<Auth />} />

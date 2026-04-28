@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import useWarehouseStore from '../store/warehouseStore';
+const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 const WarehouseAlertBanner = () => {
     // Reading alerts from the Zustand store
@@ -27,7 +28,7 @@ const WarehouseAlertBanner = () => {
     const handleAccept = async (alert) => {
         try {
             // Call the backend route
-            await axios.post('http://localhost:5000/api/warehouse/reroute', {
+            await axios.post(`${API}/api/warehouse/reroute`, {
                 truckId: alert.truckId || 'TRK-UNKNOWN', // Fallback if truckId is not in alert
                 fromWarehouseId: alert.fromWarehouseId,
                 toWarehouseId: alert.toWarehouseId,

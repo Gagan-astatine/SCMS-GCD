@@ -8,7 +8,18 @@
     "analytics": "பகுப்பாய்வு",
     "ai_assistance": "AI உதவி",
     "settings": "அமைப்புகள்",
-    "dispatch": "அனுப்புதல்"
+    "dispatch": "அனுப்புதல்",
+    "assigned_loads": "Assigned Loads",
+    "tracking": "Tracking",
+    "earnings": "Earnings",
+    "driver_portal": "Driver Portal",
+    "delivery_routes": "Delivery Routes",
+    "logout": "Logout",
+    "my_purchases": "My Purchases",
+    "invoices": "Invoices",
+    "payments": "Payments",
+    "buyer_portal": "Buyer Portal",
+    "purchasing_control": "Purchasing Control"
   },
   "cards": {
     "total_warehouses": "மொத்த கிடங்குகள்",

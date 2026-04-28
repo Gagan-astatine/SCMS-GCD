@@ -15,7 +15,16 @@ const supabase = createClient(
 );
 
 const app = express();
-app.use(cors());
+
+const corsOptions = {
+  origin: [
+    'http://localhost:3000',
+    process.env.FRONTEND_URL || 'https://your-scms-app.vercel.app'
+  ],
+  credentials: true
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Razorpay instance
@@ -140,4 +149,5 @@ app.post("/api/warehouse/reroute", async (req, res) => {
 });
 
 // START SERVER
-app.listen(5000, () => console.log("Server running on port 5000"));
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

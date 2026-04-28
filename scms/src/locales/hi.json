@@ -8,7 +8,18 @@
     "analytics": "एनालिटिक्स",
     "ai_assistance": "एआई सहायता",
     "settings": "सेटिंग्स",
-    "dispatch": "डिस्पैच"
+    "dispatch": "डिस्पैच",
+    "assigned_loads": "Assigned Loads",
+    "tracking": "Tracking",
+    "earnings": "Earnings",
+    "driver_portal": "Driver Portal",
+    "delivery_routes": "Delivery Routes",
+    "logout": "Logout",
+    "my_purchases": "My Purchases",
+    "invoices": "Invoices",
+    "payments": "Payments",
+    "buyer_portal": "Buyer Portal",
+    "purchasing_control": "Purchasing Control"
   },
   "cards": {
     "total_warehouses": "कुल गोदाम",

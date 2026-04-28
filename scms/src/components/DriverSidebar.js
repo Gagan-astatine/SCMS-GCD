@@ -1,33 +1,96 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import supabase from '../config/SupabaseClient';
 
 const DriverSidebar = () => {
-  return (
-    <div className="sidebar">
-      <div className="sidebar-header" style={{ paddingLeft: '70px' }}>
-        <h2>Driver Portal</h2>
-        <p>Delivery Routes</p>
-      </div>
+  const { t } = useTranslation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-      <nav className="sidebar-nav">
-        <NavLink to="/driver/assigned-loads" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
-          <div className="nav-icon"></div>
-          <span>Assigned Loads</span>
-        </NavLink>
-        <NavLink to="/driver/route-map" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
-          <div className="nav-icon"></div>
-          <span>Route Map</span>
-        </NavLink>
-        <NavLink to="/driver/earnings" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
-          <div className="nav-icon"></div>
-          <span>Earnings</span>
-        </NavLink>
-        <NavLink to="/driver/settings" className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}>
-          <div className="nav-icon"></div>
-          <span>Settings</span>
-        </NavLink>
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+  };
+
+  const navLinks = [
+    { to: "/orders", label: t('navigation.assigned_loads') },
+    { to: "/map", label: t('navigation.tracking') },
+    { to: "/driver/earnings", label: t('navigation.earnings') },
+    { to: "/settings", label: t('navigation.settings') }
+  ];
+
+  return (
+    <>
+      <header className="top-navbar">
+        {/* Left: Brand Name & Hamburger */}
+        <div className="top-navbar-left">
+          <button
+            className="hamburger-menu"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            ☰
+          </button>
+          <div className="top-navbar-brand">
+            <h2>IGNIS</h2>
+          </div>
+        </div>
+
+        {/* Center: Desktop Nav Links */}
+        <nav className="top-nav-links">
+          {navLinks.map((link, index) => (
+            <NavLink
+              key={index}
+              to={link.to}
+              className={({ isActive }) => "top-nav-item" + (isActive ? " active" : "")}
+            >
+              <span>{link.label}</span>
+            </NavLink>
+          ))}
+        </nav>
+
+        {/* Right: Actions */}
+        <div className="top-navbar-right">
+          <button onClick={handleLogout} className="btn-logout-nav">
+            {t('navigation.logout')}
+          </button>
+        </div>
+      </header>
+
+      {/* Mobile Drawer Overlay */}
+      <div
+        className={`mobile-drawer-overlay ${isMobileMenuOpen ? 'open' : ''}`}
+        onClick={() => setIsMobileMenuOpen(false)}
+      ></div>
+
+      {/* Mobile Drawer */}
+      <nav className={`mobile-drawer ${isMobileMenuOpen ? 'open' : ''}`}>
+        {navLinks.map((link, index) => (
+          <NavLink
+            key={index}
+            to={link.to}
+            onClick={() => setIsMobileMenuOpen(false)}
+            className={({ isActive }) => "top-nav-item" + (isActive ? " active" : "")}
+          >
+            <span>{link.label}</span>
+          </NavLink>
+        ))}
+        <button
+          onClick={handleLogout}
+          style={{
+            margin: 'auto 24px 24px 24px',
+            backgroundColor: '#f97316',
+            color: 'white',
+            border: 'none',
+            padding: '12px 16px',
+            borderRadius: '8px',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            marginTop: 'auto'
+          }}
+        >
+          {t('navigation.logout')}
+        </button>
       </nav>
-    </div>
+    </>
   );
 };
 
