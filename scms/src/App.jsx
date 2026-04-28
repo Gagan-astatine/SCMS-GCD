@@ -13,17 +13,26 @@ import Payment from "./pages/payment";
 import Sidebar from "./components/Sidebar";
 import BuyerSidebar from "./components/BuyerSidebar";
 import DriverSidebar from "./components/DriverSidebar";
-import Warehouse from "./pages/warehouse"
+import WarehousePage from "./pages/WarehousePage"
+import AnalyticsPage from "./pages/AnalyticsPage";
+import AIAssistancePage from "./pages/AIAssistancePage";
+
 import Fleet from "./pages/fleet"
 import Dispatch from "./pages/dispatch"
 import Driver from "./pages/drivers"
 import MapView from "./pages/mapview"
 import "leaflet/dist/leaflet.css"
+import useWarehouseMonitor from "./hooks/useWarehouseMonitor";
+import WarehouseAlertBanner from "./components/WarehouseAlertBanner";
+
+
+
 
 function App() {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState(null);
+  useWarehouseMonitor();
 
   // ✅ Get session
   useEffect(() => {
@@ -109,10 +118,12 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/orders" element={<Orders />} />
-            <Route path="/warehouse" element={<Warehouse />} />
+            <Route path="/analytics" element={<AnalyticsPage />} />
+            <Route path="/warehouse" element={<WarehousePage />} />
             <Route path="/Fleet" element={<Fleet />} />
             <Route path="/Dispatch" element={<Dispatch />} />
             <Route path="/drivers" element={<Driver />} />
+            <Route path="/ai-assistance" element={<AIAssistancePage />} />
             <Route path="/map" element={<MapView />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
@@ -124,7 +135,10 @@ function App() {
   return (
     <BrowserRouter>
       {session ? (
-        renderLayout()
+        <>
+          <WarehouseAlertBanner />
+          {renderLayout()}
+        </>
       ) : (
         <Routes>
           <Route path="*" element={<Auth />} />
@@ -132,6 +146,7 @@ function App() {
       )}
     </BrowserRouter>
   );
+
 }
 
 export default App;

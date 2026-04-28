@@ -1,18 +1,10 @@
 const dotenv = require("dotenv");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-
 dotenv.config();
-
-let genAI = null;
-if (process.env.GEMINI_API_KEY) {
-  genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-}
 
 const express = require("express");
 const Razorpay = require("razorpay");
 const cors = require("cors");
 const crypto = require("crypto");
-require("dotenv").config();
 
 // ✅ ADD THIS (Supabase)
 const { createClient } = require("@supabase/supabase-js");
@@ -95,55 +87,57 @@ app.post("/api/payment/verify", async (req, res) => {
   }
 });
 
-app.post("/ai-dispatch", async (req, res) => {
+// ✅ WAREHOUSE LOAD BALANCER: REROUTE TRUCK
+app.post("/api/warehouse/reroute", async (req, res) => {
   try {
-    const { fleet, loads, drivers, warehouse, query } = req.body
+    const { truckId, fromWarehouseId, toWarehouseId, reason } = req.body;
 
-    if (!genAI) {
-      return res.json({ reply: "Error: AI is not configured. Please add your GEMINI_API_KEY to the backend/.env file and restart the server." });
+    if (!truckId || !fromWarehouseId || !toWarehouseId) {
+      return res.status(400).json({ success: false, error: "Missing required fields" });
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
+    // 1. Update the truck's destination
+    const { error: truckError } = await supabase
+      .from("trucks")
+      .update({ warehouse_id: toWarehouseId })
+      .eq("id", truckId);
 
-    const prompt = `
-You are a smart logistics AI assistant.
+    if (truckError) throw truckError;
 
-DATA:
-Fleet: ${JSON.stringify(fleet)}
-Loads: ${JSON.stringify(loads)}
-Drivers: ${JSON.stringify(drivers)}
-Warehouse: ${JSON.stringify(warehouse)}
+    // 2. Log the reroute event in truck_reroutes
+    const { error: rerouteError } = await supabase
+      .from("truck_reroutes")
+      .insert([{
+        truck_id: truckId,
+        from_warehouse_id: fromWarehouseId,
+        to_warehouse_id: toWarehouseId,
+        reason: reason,
+      }]);
 
-USER QUERY:
-${query}
+    if (rerouteError) throw rerouteError;
 
-TASK:
-1. Identify problems
-2. Explain reasons
-3. Suggest actions
-4. Keep answer short and structured
+    // 3. Log the event in warehouse_logs
+    const { error: logError } = await supabase
+      .from("warehouse_logs")
+      .insert([{
+        warehouse_id: fromWarehouseId,
+        event_type: "reroute",
+        message: `Truck ${truckId} rerouted to ${toWarehouseId}. Reason: ${reason}`,
+      }]);
 
-FORMAT:
-Problems:
-- ...
+    if (logError) throw logError;
 
-Reasons:
-- ...
-
-Actions:
-- ...
-`
-
-    const result = await model.generateContent(prompt)
-    const reply = result.response.text()
-
-    res.json({ reply })
+    // 4. Return success
+    res.json({
+      success: true,
+      message: `Truck ${truckId} successfully rerouted.`,
+    });
 
   } catch (err) {
-    console.log(err)
-    res.status(500).json({ error: "AI failed" })
+    console.error("REROUTE ERROR:", err);
+    res.status(500).json({ success: false, error: err.message });
   }
-})
+});
 
 // START SERVER
 app.listen(5000, () => console.log("Server running on port 5000"));

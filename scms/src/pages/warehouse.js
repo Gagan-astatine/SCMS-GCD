@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import supabase from "../config/SupabaseClient"
+import WarehouseMap from '../components/WarehouseMap';
 
 const Warehouse = () => {
     const [fetchError, setFetchError] = useState(null)
@@ -32,6 +33,13 @@ const Warehouse = () => {
                 <h2>Warehouse Facilities</h2>
                 <p>Manage and monitor real-time inventory and distribution centers.</p>
             </div>
+
+            <div style={{ marginTop: '20px' }}>
+                <WarehouseMap />
+            </div>
+
+
+
 
             {fetchError && (<p className="error">{fetchError}</p>)}
 
