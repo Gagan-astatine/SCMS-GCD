@@ -284,6 +284,10 @@ code {
   background-color: #f8fafc;
 }
 
+.top-nav-layout {
+  flex-direction: column;
+}
+
 .main-content {
   flex: 1;
   overflow-y: auto;
@@ -569,3 +573,212 @@ code {
   margin: 8px 0 0;
   font-size: 1rem;
 }
+
+/* Splash Screen Logo Animation */
+.splash-logo-global {
+  position: fixed;
+  z-index: 10000;
+  width: 65px;
+  height: 65px;
+  object-fit: contain;
+  animation: splashMove 2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  pointer-events: none; /* prevent it from blocking clicks during animation */
+}
+
+@keyframes splashMove {
+  0% {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(5);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  60% {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(5);
+    opacity: 1;
+  }
+  100% {
+    top: 12px; /* Slightly up */
+    left: 20px;
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* --- Zepto-style Top Navbar --- */
+.top-navbar {
+  width: 100%;
+  background-color: #ffffff;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid #e2e8f0;
+  height: 70px;
+  position: relative;
+  z-index: 50;
+}
+
+.top-navbar-left {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.top-navbar-brand {
+  margin-left: 70px; /* Space for the splash logo */
+  display: flex;
+  align-items: center;
+}
+
+.top-navbar-brand h2 {
+  margin: 0;
+  font-size: 1.6rem;
+  color: #f97316; /* Orange accent */
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.top-nav-links {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  justify-content: center;
+}
+
+.top-nav-item {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 16px;
+  color: #64748b;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  position: relative;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+
+.top-nav-item:hover {
+  color: #f97316;
+}
+
+.top-nav-item.active {
+  color: #f97316;
+}
+
+.top-nav-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: #f97316;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.top-navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 100%;
+}
+
+.btn-logout-nav {
+  background: #fef2f2;
+  color: #ef4444;
+  border: 1px solid #fecaca;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-logout-nav:hover {
+  background: #fee2e2;
+}
+
+.hamburger-menu {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #0f172a;
+  cursor: pointer;
+  padding: 8px;
+}
+
+/* Mobile Drawer Styles */
+.mobile-drawer-overlay {
+  display: none;
+  position: fixed;
+  top: 70px;
+  left: 0;
+  width: 100vw;
+  height: calc(100vh - 70px);
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 40;
+}
+
+.mobile-drawer {
+  display: none;
+  position: fixed;
+  top: 70px;
+  left: 0;
+  width: 250px;
+  height: calc(100vh - 70px);
+  background-color: #ffffff;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+  flex-direction: column;
+  padding: 20px 0;
+  z-index: 50;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease-in-out;
+}
+
+.mobile-drawer.open {
+  transform: translateX(0);
+}
+
+.mobile-drawer .top-nav-item {
+  height: auto;
+  padding: 16px 24px;
+  border-left: 3px solid transparent;
+}
+
+.mobile-drawer .top-nav-item.active {
+  border-left-color: #f97316;
+  background-color: #fff7ed;
+}
+
+.mobile-drawer .top-nav-item.active::after {
+  display: none; /* Hide bottom border on mobile drawer */
+}
+
+@media (max-width: 1024px) {
+  .top-nav-links {
+    display: none; /* Hide horizontal links on mobile */
+  }
+  .hamburger-menu {
+    display: block;
+  }
+  .mobile-drawer {
+    display: flex;
+  }
+  .mobile-drawer-overlay.open {
+    display: block;
+  }
+}
+

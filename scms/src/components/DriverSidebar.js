@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 const DriverSidebar = () => {
   return (
     <div className="sidebar">
-      <div className="sidebar-header">
+      <div className="sidebar-header" style={{ paddingLeft: '70px' }}>
         <h2>Driver Portal</h2>
         <p>Delivery Routes</p>
       </div>

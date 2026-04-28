@@ -79,8 +79,9 @@ const LanguageSwitcher = ({ placement = 'top' }) => {
         <div 
           style={{
             position: 'absolute',
-            // Control dropdown direction based on placement prop
-            [placement === 'bottom' ? 'bottom' : 'top']: 'calc(100% + 8px)',
+            // If placement='bottom', dropdown should be positioned below the button (top: 100%)
+            // If placement='top', dropdown should be positioned above the button (bottom: 100%)
+            [placement === 'bottom' ? 'top' : 'bottom']: 'calc(100% + 8px)',
             left: 0,
             backgroundColor: '#1e293b',
             border: '1px solid #334155',
