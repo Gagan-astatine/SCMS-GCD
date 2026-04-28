@@ -22,6 +22,7 @@ import Fleet from "./pages/fleet"
 import Dispatch from "./pages/dispatch"
 import Driver from "./pages/drivers"
 import MapView from "./pages/mapview"
+import DriverEarnings from "./pages/DriverEarnings";
 import "leaflet/dist/leaflet.css"
 import useWarehouseMonitor from "./hooks/useWarehouseMonitor";
 import WarehouseAlertBanner from "./components/WarehouseAlertBanner";
@@ -109,6 +110,7 @@ function App() {
               <Route path="/" element={<Navigate to="/orders" replace />} />
               <Route path="/orders" element={<Orders />} />
               <Route path="/map" element={<MapView />} />
+              <Route path="/driver/earnings" element={<DriverEarnings />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="*" element={<Navigate to="/orders" replace />} />
             </Routes>

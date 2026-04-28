@@ -49,8 +49,8 @@ const MapView = () => {
             // Convert location string → lat/lng
             const formatted = data.map((item) => {
                 // Safely grab the coordinate string from either the new or old column
-                const locString = item.FleetLocations || item.location;
-                
+                const locString = item.FleetLocations || item.loaction || item.location;
+
                 if (!locString || typeof locString !== 'string') return null;
 
                 const [lat, lng] = locString.split(",").map(Number)
@@ -103,7 +103,7 @@ const MapView = () => {
                         <Marker key={truck.vehicle_id} position={[truck.lat, truck.lng]} icon={truckIcon}>
                             <Popup>
                                 <div style={{ textAlign: 'center' }}>
-                                    <h3 style={{ margin: '0 0 5px 0', color: '#0f172a' }}>Truck #{truck.vehicle_id}</h3>
+                                    <h3 style={{ margin: '0 0 5px 0', color: '#0f172a' }}>Truck #{truck["Vehicle Id"] || truck.vehicle_id}</h3>
                                     <span style={{ fontSize: '0.85rem', color: '#64748b', background: '#f1f5f9', padding: '4px 8px', borderRadius: '8px' }}>
                                         {truck.displayLoc}
                                     </span>

@@ -18,7 +18,7 @@ const AnimatedChart = ({ children }) => {
                 }
             });
         }, { threshold: 0.1 });
-        
+
         if (domRef.current) observer.observe(domRef.current);
         return () => observer.disconnect();
     }, []);
@@ -27,7 +27,7 @@ const AnimatedChart = ({ children }) => {
 };
 
 const AnalyticsPage = () => {
-        const [data, setData] = useState({
+    const [data, setData] = useState({
         warehouses: [],
         logs: [],
         reroutes: [],
@@ -149,7 +149,10 @@ const AnalyticsPage = () => {
     }).length;
 
     const totalTrucks = data.fleet.length;
-    const activeTrucks = data.fleet.filter(t => t.vehicle_status === true || t.vehicle_status === 'true').length;
+    const activeTrucks = data.fleet.filter(t => 
+        t.vehicle_status === true || t.vehicle_status === 'true' || 
+        t["vehicle status"] === true || t["vehicle status"] === 'true'
+    ).length;
 
     const totalOrders = data.orders.length;
     const totalDrivers = data.drivers.length;
@@ -264,19 +267,19 @@ const AnalyticsPage = () => {
                                                 <feComposite in="SourceGraphic" in2="blur" operator="over" />
                                             </filter>
                                             <linearGradient id="colorGreen" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="0%" stopColor="#86efac" stopOpacity={1}/>
-                                                <stop offset="40%" stopColor="#22c55e" stopOpacity={0.9}/>
-                                                <stop offset="100%" stopColor="#15803d" stopOpacity={0.8}/>
+                                                <stop offset="0%" stopColor="#86efac" stopOpacity={1} />
+                                                <stop offset="40%" stopColor="#22c55e" stopOpacity={0.9} />
+                                                <stop offset="100%" stopColor="#15803d" stopOpacity={0.8} />
                                             </linearGradient>
                                             <linearGradient id="colorOrange" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="0%" stopColor="#fde047" stopOpacity={1}/>
-                                                <stop offset="40%" stopColor="#f97316" stopOpacity={0.9}/>
-                                                <stop offset="100%" stopColor="#c2410c" stopOpacity={0.8}/>
+                                                <stop offset="0%" stopColor="#fde047" stopOpacity={1} />
+                                                <stop offset="40%" stopColor="#f97316" stopOpacity={0.9} />
+                                                <stop offset="100%" stopColor="#c2410c" stopOpacity={0.8} />
                                             </linearGradient>
                                             <linearGradient id="colorRed" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="0%" stopColor="#fca5a5" stopOpacity={1}/>
-                                                <stop offset="40%" stopColor="#ef4444" stopOpacity={0.9}/>
-                                                <stop offset="100%" stopColor="#b91c1c" stopOpacity={0.8}/>
+                                                <stop offset="0%" stopColor="#fca5a5" stopOpacity={1} />
+                                                <stop offset="40%" stopColor="#ef4444" stopOpacity={0.9} />
+                                                <stop offset="100%" stopColor="#b91c1c" stopOpacity={0.8} />
                                             </linearGradient>
                                         </defs>
                                         <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
@@ -315,14 +318,14 @@ const AnalyticsPage = () => {
                                                 <feComposite in="SourceGraphic" in2="blur" operator="over" />
                                             </filter>
                                             <linearGradient id="colorInbound" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="0%" stopColor="#93c5fd" stopOpacity={1}/>
-                                                <stop offset="40%" stopColor="#3b82f6" stopOpacity={0.9}/>
-                                                <stop offset="100%" stopColor="#1d4ed8" stopOpacity={0.8}/>
+                                                <stop offset="0%" stopColor="#93c5fd" stopOpacity={1} />
+                                                <stop offset="40%" stopColor="#3b82f6" stopOpacity={0.9} />
+                                                <stop offset="100%" stopColor="#1d4ed8" stopOpacity={0.8} />
                                             </linearGradient>
                                             <linearGradient id="colorOutbound" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="0%" stopColor="#fde047" stopOpacity={1}/>
-                                                <stop offset="40%" stopColor="#f97316" stopOpacity={0.9}/>
-                                                <stop offset="100%" stopColor="#c2410c" stopOpacity={0.8}/>
+                                                <stop offset="0%" stopColor="#fde047" stopOpacity={1} />
+                                                <stop offset="40%" stopColor="#f97316" stopOpacity={0.9} />
+                                                <stop offset="100%" stopColor="#c2410c" stopOpacity={0.8} />
                                             </linearGradient>
                                         </defs>
                                         <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
