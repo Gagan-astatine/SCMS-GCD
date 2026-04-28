@@ -146,7 +146,7 @@ function App() {
   return (
     <BrowserRouter>
       <div className="splash-overlay"></div>
-      <img src="/IGNIS.png" alt="IGNIS Logo" className="splash-logo-global" />
+      {session && <img src="/IGNIS.png" alt="IGNIS Logo" className="splash-logo-global" />}
       {session ? (
         renderLayout()
       ) : (
