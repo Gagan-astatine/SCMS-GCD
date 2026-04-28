@@ -252,7 +252,7 @@ const AnalyticsPage = () => {
                 {/* SECTION 2: Warehouse Capacity */}
                 <div style={cardStyle}>
                     <h3 style={titleStyle}>Warehouse Capacity (%)</h3>
-                    <div style={{ width: '100%', height: 300 }}>
+                    <div style={{ width: '100%', height: 300 }} className="notranslate">
                         {warehouseCapacityData.length > 0 ? (
                             <ResponsiveContainer>
                                 <AnimatedChart>
@@ -303,7 +303,7 @@ const AnalyticsPage = () => {
                 {/* SECTION 7: Inbound vs Outbound */}
                 <div style={cardStyle}>
                     <h3 style={titleStyle}>Inbound vs Outbound Volume</h3>
-                    <div style={{ width: '100%', height: 300 }}>
+                    <div style={{ width: '100%', height: 300 }} className="notranslate">
                         {ioData.length > 0 ? (
                             <ResponsiveContainer>
                                 <AnimatedChart>
@@ -352,7 +352,7 @@ const AnalyticsPage = () => {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                     <div style={cardStyle}>
                         <h3 style={titleStyle}>Order Status Distribution</h3>
-                        <div style={{ width: '100%', height: 250 }}>
+                        <div style={{ width: '100%', height: 250 }} className="notranslate">
                             {orderStatusData.length > 0 ? (
                                 <ResponsiveContainer>
                                     <AnimatedChart>
@@ -374,7 +374,7 @@ const AnalyticsPage = () => {
 
                     <div style={cardStyle}>
                         <h3 style={titleStyle}>Fleet Status</h3>
-                        <div style={{ width: '100%', height: 250 }}>
+                        <div style={{ width: '100%', height: 250 }} className="notranslate">
                             {data.fleet.length > 0 ? (
                                 <ResponsiveContainer>
                                     <AnimatedChart>

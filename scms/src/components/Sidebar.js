@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import useWarehouseMonitor from '../hooks/useWarehouseMonitor';
 import supabase from '../config/SupabaseClient';
+import GoogleTranslate from './GoogleTranslate';
 
 const Sidebar = () => {
   const { overflowing } = useWarehouseMonitor();
@@ -75,7 +76,7 @@ const Sidebar = () => {
 
           
 
-          <div id="google_translate_element"></div>
+          <GoogleTranslate />
           <button onClick={handleLogout} className="btn-logout-nav">
             Logout
           </button>

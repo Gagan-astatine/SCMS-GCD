@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import supabase from '../config/SupabaseClient';
+import GoogleTranslate from './GoogleTranslate';
 
 const BuyerSidebar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -48,7 +49,7 @@ const BuyerSidebar = () => {
 
         {/* Right: Actions */}
         <div className="top-navbar-right">
-          <div id="google_translate_element"></div>
+          <GoogleTranslate />
           <button onClick={handleLogout} className="btn-logout-nav">
             Logout
           </button>
