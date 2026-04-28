@@ -782,3 +782,30 @@ code {
   }
 }
 
+@media (max-width: 600px) {
+  .top-navbar {
+    padding: 0 10px;
+  }
+  .top-navbar-brand {
+    margin-left: 50px; /* Compress margin for splash logo */
+  }
+  .top-navbar-brand h2 {
+    font-size: 1.2rem;
+  }
+  .btn-logout-nav {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+  }
+  .language-switcher-container {
+    width: 120px !important;
+  }
+  .top-navbar-right {
+    gap: 8px;
+  }
+  .splash-logo-global {
+    width: 45px !important;
+    height: 45px !important;
+    top: 15px !important;
+  }
+}
+

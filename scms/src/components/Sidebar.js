@@ -94,7 +94,7 @@ const Sidebar = () => {
             )}
           </div>
           
-          <div style={{ width: '160px' }}>
+          <div className="language-switcher-container" style={{ width: '160px' }}>
             <LanguageSwitcher placement="bottom" />
           </div>
 
