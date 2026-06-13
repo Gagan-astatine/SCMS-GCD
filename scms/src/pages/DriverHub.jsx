@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { UserCheck, Truck, Coffee, DollarSign, CheckCircle, BarChart3, MapPin, Navigation, Clock, Camera, Leaf, Loader2, X, Compass, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { UserCheck, Truck, Coffee, DollarSign, CheckCircle, BarChart3, MapPin, Navigation, Clock, Camera, Leaf, Loader2, X, Compass } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 import supabase from '../config/SupabaseClient';
@@ -311,7 +311,7 @@ const DriverHub = () => {
   };
 
   // ── Init ──────────────────────────────────────────────────────────────────
-  const fetchDriverState = async (sessionUser) => {
+  const fetchDriverState = useCallback(async (sessionUser) => {
     // 1. Fetch profiles
     const { data: profileRow } = await supabase
       .from('profiles')
@@ -348,7 +348,7 @@ const DriverHub = () => {
     setVehicleLocation(formatCoordinateString(fleetRow?.location || ''));
     setVehicleActive(fleetRow ? (fleetRow.status === 'Active' || fleetRow.status === 'Running') : true);
     setProfileLoading(false);
-  };
+  }, []);
 
   useEffect(() => {
     const init = async () => {
@@ -413,7 +413,7 @@ const DriverHub = () => {
       }
     };
     init();
-  }, []);
+  }, [fetchDriverState]);
 
   // ── Earnings chart data ───────────────────────────────────────────────────
   const buildChartData = () => {

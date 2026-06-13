@@ -437,7 +437,7 @@ const MapView = () => {
 
                                     {/* Cost stats */}
                                     <div style={{ padding: '12px 14px', borderRadius: '12px', background: 'rgba(236, 72, 153, 0.04)', border: '1px solid #fbcfe8', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                        <div style={{ fontSize: '#db2777', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', color: '#db2777' }}>
+                                        <div style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', color: '#db2777' }}>
                                             <TrendingUp size={14} /> Trip Cost & Emissions
                                         </div>
                                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>

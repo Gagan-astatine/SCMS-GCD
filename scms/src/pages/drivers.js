@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react"
-import { Search, ArrowUpDown, Filter, Star } from 'lucide-react';
+import { Search, ArrowUpDown, Filter } from 'lucide-react';
 import supabase from "../config/SupabaseClient"
 import useClickOutside from "../hooks/useClickOutside"
 
@@ -23,7 +23,7 @@ const Driver = () => {
     const [phone, setPhone] = useState('')
     const [password, setPassword] = useState('')
     const [licenseNumber, setLicenseNumber] = useState('')
-    const [driverStatus, setDriverStatus] = useState('Active')
+    const driverStatus = 'Active'
     const [addLoading, setAddLoading] = useState(false)
     const [addError, setAddError] = useState(null)
 
