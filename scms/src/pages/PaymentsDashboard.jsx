@@ -6,19 +6,20 @@ import supabase from "../config/SupabaseClient";
 const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 // ─── Invoice Generator ────────────────────────────────────────────────────────
-const generateInvoiceHTML = (payment) => {
-  const date = new Date(payment.created_at || Date.now()).toLocaleDateString("en-IN", {
+const generateInvoiceHTML = (payment, order = null) => {
+  const date = new Date(payment?.created_at || order?.created_at || Date.now()).toLocaleDateString("en-IN", {
     year: "numeric", month: "long", day: "numeric"
   });
-  const amount = (payment.amount / 100).toFixed(2);
-  const tax = (payment.amount / 100 * 0.18).toFixed(2);
-  const subtotal = ((payment.amount / 100) - parseFloat(tax)).toFixed(2);
+  const rawAmount = payment?.amount || (order?.assigned_amount ? order.assigned_amount * 100 : (order?.amount || 0));
+  const amount = (rawAmount / 100).toFixed(2);
+  const tax = (rawAmount / 100 * 0.18).toFixed(2);
+  const subtotal = ((rawAmount / 100) - parseFloat(tax)).toFixed(2);
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <title>Invoice - ${payment.razorpay_order_id}</title>
+  <title>Invoice - ${payment?.razorpay_order_id || order?.razorpay_order_id || order?.load_id || "N/A"}</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; color: #1e293b; padding: 40px; }
@@ -69,8 +70,8 @@ const generateInvoiceHTML = (payment) => {
         </div>
         <div class="party-block">
           <h3>Payment Reference</h3>
-          <p><strong>Order ID</strong>${payment.razorpay_order_id || "N/A"}<br/>
-          <strong>Payment ID</strong>${payment.razorpay_payment_id || "N/A"}</p>
+          <p><strong>Order ID</strong>${payment?.razorpay_order_id || order?.razorpay_order_id || order?.load_id || "N/A"}<br/>
+          <strong>Payment ID</strong>${payment?.razorpay_payment_id || "N/A"}</p>
         </div>
       </div>
       <table>
@@ -111,13 +112,13 @@ const generateInvoiceHTML = (payment) => {
 </html>`;
 };
 
-const downloadInvoice = (payment) => {
-  const html = generateInvoiceHTML(payment);
+const downloadInvoice = (payment, order = null) => {
+  const html = generateInvoiceHTML(payment, order);
   const blob = new Blob([html], { type: "text/html" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `IGNIS-Invoice-${payment.razorpay_order_id || "INV"}.html`;
+  a.download = `IGNIS-Invoice-${payment?.razorpay_order_id || order?.razorpay_order_id || order?.load_id || "INV"}.html`;
   a.click();
   URL.revokeObjectURL(url);
 };
@@ -610,7 +611,7 @@ const PaymentsDashboard = () => {
                         {isPaid ? (
                           <div style={{ display: "flex", gap: "8px" }}>
                             <button
-                              onClick={() => { setSelectedPayment(row._payment); setInvoicePreview(true); }}
+                              onClick={() => { setSelectedPayment(row); setInvoicePreview(true); }}
                               title="Preview Invoice"
                               style={{
                                 background: "rgba(249,115,22,0.1)",
@@ -633,7 +634,7 @@ const PaymentsDashboard = () => {
                               <FileText size={12} /> Invoice
                             </button>
                             <button
-                              onClick={() => downloadInvoice(row._payment)}
+                              onClick={() => downloadInvoice(row._payment, row)}
                               title="Download Invoice"
                               style={{
                                 background: "rgba(16,185,129,0.1)",
@@ -711,7 +712,7 @@ const PaymentsDashboard = () => {
               <h3 style={{ margin: 0, fontWeight: 700, color: "var(--text-primary)", fontSize: "1rem", display: "flex", alignItems: "center", gap: "6px" }}><FileText size={16} /> Invoice Preview</h3>
               <div style={{ display: "flex", gap: "8px" }}>
                 <button
-                  onClick={() => downloadInvoice(selectedPayment)}
+                  onClick={() => downloadInvoice(selectedPayment._payment, selectedPayment)}
                   style={{
                     background: "#f97316", color: "white",
                     border: "none", padding: "8px 16px",
@@ -738,7 +739,7 @@ const PaymentsDashboard = () => {
             </div>
             {/* Invoice iframe */}
             <iframe
-              srcDoc={generateInvoiceHTML(selectedPayment)}
+              srcDoc={generateInvoiceHTML(selectedPayment._payment, selectedPayment)}
               style={{ width: "100%", height: "600px", border: "none" }}
               title="Invoice Preview"
             />
