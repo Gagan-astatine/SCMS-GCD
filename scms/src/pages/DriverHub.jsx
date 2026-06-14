@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { UserCheck, Truck, Coffee, IndianRupee, CheckCircle, BarChart3, MapPin, Navigation, Clock, Camera, Leaf, Loader2, X, Compass, Shield, AlertTriangle, Flag, RefreshCw, Ban, XCircle, Check } from 'lucide-react';
+import { UserCheck, Truck, Coffee, IndianRupee, CheckCircle, BarChart3, MapPin, Navigation, Clock, Camera, Leaf, Loader2, X, Compass, Shield, AlertTriangle, Flag, Ban, XCircle, Check } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 import supabase from '../config/SupabaseClient';
@@ -279,7 +279,7 @@ const DriverHub = () => {
   const [activeRouteError, setActiveRouteError] = useState(null);
 
   // ── Duty-Time / GPS Enforcement State ────────────────────────────────────
-  const [dutySession, setDutySession] = useState(null);       // active DB session
+  // const [dutySession, setDutySession] = useState(null);       // active DB session
   const [checkpoints, setCheckpoints] = useState([]);          // route checkpoints
   const [driveMinutes, setDriveMinutes] = useState(0);         // local timer (minutes)
   const [dutyTimerActive, setDutyTimerActive] = useState(false);
@@ -352,7 +352,6 @@ const DriverHub = () => {
       const res = await fetch(`${API}/api/driver/duty-status?${params}`);
       const data = await res.json();
       if (data.session) {
-        setDutySession(data.session);
         const saved = data.session.total_drive_minutes || 0;
         setDriveMinutes(saved);
         driveMinutesRef.current = saved;
@@ -406,7 +405,6 @@ const DriverHub = () => {
       setJourneyLoadId(trip.load_id);
       setCheckpoints(data.checkpoints || []);
       setDutyTimerActive(true);
-      setDutySession({ load_id: trip.load_id, status: 'active', total_drive_minutes: driveMinutesRef.current });
     } catch (err) {
       alert('Error starting journey: ' + err.message);
     } finally {
