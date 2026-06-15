@@ -12,7 +12,7 @@ from predict import predict_overflow
 load_dotenv()
  
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:3000", os.getenv("FRONTEND_URL", "http://localhost:3000")])
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 REQUIRED_PREDICTION_FIELDS = {
     "current_load",
@@ -257,5 +257,5 @@ if __name__ == "__main__":
     # Start background snapshot scheduler
     snapshot_thread = threading.Thread(target=_auto_snapshot_loop, daemon=True)
     snapshot_thread.start()
-    print("IGNIS Prediction API starting on http://localhost:5000")
-    app.run(host="0.0.0.0", port=5000, debug=False)
+    print("IGNIS Prediction API starting on http://localhost:5001")
+    app.run(host="0.0.0.0", port=5001, debug=False)

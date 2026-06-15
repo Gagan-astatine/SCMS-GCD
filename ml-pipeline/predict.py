@@ -7,7 +7,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 from dotenv import load_dotenv
  
-import tensorflow as tf
+
  
 load_dotenv()
  
@@ -36,7 +36,6 @@ def _load_models():
             )
         _rf_model = joblib.load(rf_path)
         _scaler = joblib.load(sc_path)
-        _lstm_model = tf.keras.models.load_model(lstm_path)
  
  
 # ─────────────────────────────────────────────────────────────────────────────
@@ -335,12 +334,8 @@ def predict_overflow(
     x_rf_scaled = _scaler.transform(x_rf)
     rf_risk = float(np.clip(_rf_model.predict(x_rf_scaled)[0], 0, 100))
  
-    # ── LSTM prediction ───────────────────────────────────────────────────
-    lstm_raw = float(_lstm_model.predict(x_lstm, verbose=0)[0][0])
-    lstm_risk = np.clip(lstm_raw * 100, 0, 100)
- 
-    # ── Ensemble: weighted average (RF 60%, LSTM 40%) ─────────────────────
-    base_risk = 0.6 * rf_risk + 0.4 * lstm_risk
+    # ── Ensemble: using only RF since tensorflow is unsupported ───────────
+    base_risk = rf_risk
  
     # ── Apply weather disruption multiplier ───────────────────────────────
     final_risk = float(np.clip(base_risk * weather["factor"], 0, 100))

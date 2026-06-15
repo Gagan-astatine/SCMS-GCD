@@ -53,7 +53,7 @@ const WarehousePage = () => {
     const fetchPredictions = async () => {
         setLoadingPredictions(true);
         try {
-            const res = await axios.get('http://localhost:5000/api/predict/all');
+            const res = await axios.get('http://localhost:5001/api/predict/all');
             if (res.data && res.data.predictions) {
              setPredictions(res.data.predictions);
              setMlApiOnline(true);
@@ -124,7 +124,7 @@ const WarehousePage = () => {
     const fetchHistory = async (whId) => {
         setLoadingHistory(true);
         try {
-            const res = await axios.get(`http://localhost:5000/api/history/${whId}`);
+            const res = await axios.get(`http://localhost:5001/api/history/${whId}`);
             if (res.data && res.data.success) {
                 setWhHistoryData(res.data.history);
             } else {
@@ -454,7 +454,7 @@ const WarehousePage = () => {
                             fontWeight: '600'
                         }}>
                             <AlertTriangle size={20} />
-                            <span>ML Engine Server (Port 5000) is offline. Displaying real-time simulated forecasts. Start python api.py to connect live pipeline.</span>
+                            <span>ML Engine Server (Port 5001) is offline. Displaying real-time simulated forecasts. Start python api.py to connect live pipeline.</span>
                             <button 
                                 onClick={fetchPredictions} 
                                 style={{
