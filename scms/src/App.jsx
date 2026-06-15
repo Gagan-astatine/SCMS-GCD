@@ -142,7 +142,7 @@ function App() {
     // 🏪 OWNER / SELLER (default)
     return (
       <>
-        <WarehouseAlertBanner />
+
         <div className="app-layout top-nav-layout">
           <Sidebar />
           <main className="main-content">
