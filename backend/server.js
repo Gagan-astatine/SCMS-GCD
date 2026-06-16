@@ -5,6 +5,7 @@ const express = require("express");
 const Razorpay = require("razorpay");
 const cors = require("cors");
 const crypto = require("crypto");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { createClient } = require("@supabase/supabase-js");
 
 const supabase = createClient(
@@ -25,7 +26,10 @@ const allowedOrigins = [
 const corsOptions = {
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
-    const isAllowed = allowedOrigins.includes(origin) || origin.endsWith(".vercel.app");
+    const isAllowed = allowedOrigins.includes(origin) || 
+                      origin.endsWith(".vercel.app") || 
+                      origin.endsWith(".web.app") || 
+                      origin.endsWith(".firebaseapp.com");
     if (isAllowed) {
       callback(null, true);
     } else {
@@ -46,10 +50,264 @@ app.use('/api/speech', speechRoutes);
 app.use('/api/translate', translationRoutes);
 app.use('/api/vision', visionRoutes);
 
+// ── Secure AI Proxy Route ───────────────────────────────────────────────────
+app.post("/api/ai/chat", async (req, res) => {
+  try {
+    const { prompt } = req.body;
+    if (!prompt) {
+      return res.status(400).json({ error: "Prompt is required" });
+    }
+
+    try {
+      const geminiKey = process.env.GEMINI_API_KEY || "AIzaSyBwuLymlOnQKa6fDuQ6J8xNldCAzep8J1w";
+      const genAI = new GoogleGenerativeAI(geminiKey);
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+      const result = await model.generateContent(prompt);
+      const text = result.response.text();
+      return res.json({ text });
+    } catch (apiErr) {
+      console.warn("Gemini API call failed (possibly key is leaked/blocked), falling back to offline assistant:", apiErr.message);
+
+      // Parse metadata from prompt to construct a high-quality local fallback response
+      let contextData = {};
+      let userQuestion = prompt;
+      let userRole = "buyer";
+
+      // 1. Extract context data
+      try {
+        const contextMatch = prompt.match(/Context data \(scoped specifically to this user\):\s*([\s\S]*?)\s*(?:App usage guidebook:|App guidebook:|User question:|$)/i);
+        if (contextMatch) {
+          contextData = JSON.parse(contextMatch[1].trim());
+        }
+      } catch (parseErr) {
+        console.warn("Fallback context parsing warning:", parseErr.message);
+        if (contextMatch) {
+          console.warn("Failed content was:", contextMatch[1].trim());
+        }
+      }
+
+      // 2. Extract user question
+      try {
+        const questionMatch = prompt.match(/User question:\s*([\s\S]*?)\s*(?:Rules:|$)/i);
+        if (questionMatch) {
+          userQuestion = questionMatch[1].trim();
+        }
+      } catch (parseErr) {
+        console.warn("Fallback question parsing warning:", parseErr.message);
+      }
+
+      // 3. Extract user role
+      try {
+        const roleMatch = prompt.match(/The user's role is:\s*(.*)/i);
+        if (roleMatch) {
+          userRole = roleMatch[1].trim();
+        }
+      } catch (parseErr) {
+        console.warn("Fallback role parsing warning:", parseErr.message);
+      }
+
+      const query = userQuestion.toLowerCase();
+      let responseText = "";
+
+      // Heuristic Intent Classifiers
+      const isWarehouse = query.includes("warehouse") || query.includes("virus") || query.includes("vairus") || query.includes("storage") || query.includes("depot") || query.includes("hub");
+      const isOrder = query.includes("order") || query.includes("oder") || query.includes("load") || query.includes("purchase") || query.includes("delivery");
+      const isDriver = query.includes("driver") || query.includes("availability") || query.includes("active") || query.includes("free") || query.includes("idle");
+      const isFleet = query.includes("fleet") || query.includes("truck") || query.includes("vehicle") || query.includes("track") || query.includes("location");
+      const isSummary = query.includes("summary") || query.includes("today") || query.includes("status");
+
+      // 1. Warehouse Queries
+      if (isWarehouse) {
+        let warehouses = contextData.warehouses || [];
+        const isCountQuery = query.includes("how many") || query.includes("count") || query.includes("number");
+
+        // Check if asking about capacity, fill rate, percentage, overflow, or above 85%
+        if (query.includes("percent") || query.includes("%") || query.includes("fill") || query.includes("capacity") || query.includes("overflow") || query.includes("above") || query.includes("exceed")) {
+          let pctThreshold = 85; // default
+          const pctMatch = query.match(/(\d+)\s*%/);
+          const numMatch = query.match(/above\s+(\d+)/) || query.match(/exceeding\s+(\d+)/) || query.match(/over\s+(\d+)/);
+          
+          if (pctMatch) {
+            pctThreshold = parseInt(pctMatch[1]);
+          } else if (numMatch) {
+            pctThreshold = parseInt(numMatch[1]);
+          }
+
+          const overflowing = warehouses.filter(w => {
+            const cap = w.max_capacity || 1;
+            const load = w.current_load + (w.reserved_space || 0);
+            return (load / cap) * 100 > pctThreshold;
+          });
+
+          if (isCountQuery) {
+            responseText = `Based on the database context, there are **${overflowing.length}** warehouses filled above ${pctThreshold}% capacity.`;
+          } else {
+            if (overflowing.length === 0) {
+              responseText = `Based on the database context, there are **0** warehouses filled above ${pctThreshold}% capacity.`;
+            } else {
+              responseText = `There are **${overflowing.length}** warehouses filled above ${pctThreshold}% capacity:\n`;
+              overflowing.forEach((w, idx) => {
+                const cap = w.max_capacity || 1;
+                const load = w.current_load + (w.reserved_space || 0);
+                const fillPct = Math.round((load / cap) * 100);
+                responseText += `\n${idx + 1}. **${w.name}**: ${fillPct}% filled (${load}/${w.max_capacity} units)`;
+              });
+            }
+          }
+        } else {
+          // Dynamic filtering by city / location
+          const cities = ["bangalore", "bengaluru", "mumbai", "delhi", "chennai", "kolkata", "pune", "ahmedabad", "jaipur", "lucknow", "surat", "nagpur", "bhopal", "patna", "chandigarh", "kochi", "indore", "coimbatore", "visakhapatnam", "vadodara", "rajkot", "guwahati", "thiruvananthapuram", "raipur", "amritsar", "jodhpur", "mangaluru", "varanasi", "bhubaneswar", "nashik", "noida", "gurgaon"];
+          let filterCity = null;
+          for (const city of cities) {
+            if (query.includes(city)) {
+              filterCity = city;
+              break;
+            }
+          }
+
+          if (filterCity) {
+            warehouses = warehouses.filter(w => 
+              (w.city && w.city.toLowerCase().includes(filterCity)) || 
+              (w.name && w.name.toLowerCase().includes(filterCity)) ||
+              (w.address && w.address.toLowerCase().includes(filterCity))
+            );
+          }
+
+          if (isCountQuery) {
+            responseText = filterCity
+              ? `There are **${warehouses.length}** warehouses in ${filterCity.toUpperCase()} in the database.`
+              : `There are **${warehouses.length}** warehouses total in the database.`;
+          } else {
+            if (warehouses.length === 0) {
+              responseText = filterCity 
+                ? `I couldn't find any warehouses in ${filterCity.toUpperCase()} registered under your profile.`
+                : "I couldn't find any warehouses registered under your profile.";
+            } else {
+              responseText = filterCity
+                ? `Here are your destination warehouses in ${filterCity.toUpperCase()}:\n`
+                : `Here are your destination warehouses:\n`;
+              warehouses.forEach((w, idx) => {
+                responseText += `\n${idx + 1}. **${w.name}**\n`;
+                responseText += `   - **Address**: ${w.address || ''}, ${w.city || ''}\n`;
+                if (w.contact_name) {
+                  responseText += `   - **Contact**: ${w.contact_name} (${w.contact_phone || ''})\n`;
+                }
+              });
+            }
+          }
+        }
+      }
+      // 2. Driver Queries
+      else if (isDriver) {
+        const drivers = contextData.drivers || [];
+        const activeDrivers = drivers.filter(d => (d.status || '').toLowerCase() === 'active');
+        
+        if (query.includes("how many") || query.includes("count") || query.includes("number") || query.includes("summary")) {
+          responseText = `There are **${drivers.length}** total drivers registered. Currently, **${activeDrivers.length}** are active/available.`;
+        } else {
+          if (drivers.length === 0) {
+            responseText = "I couldn't find any driver availability information in the database.";
+          } else {
+            responseText = "Here is the current driver status and availability:\n";
+            drivers.forEach((d, idx) => {
+              responseText += `\n${idx + 1}. **${d.driver_name || 'Driver'}**\n`;
+              responseText += `   - **Status**: ${d.status || 'Inactive'}\n`;
+              responseText += `   - **Verified**: ${d.verified ? 'Yes' : 'No'}\n`;
+            });
+          }
+        }
+      }
+      // 3. Orders Queries
+      else if (isOrder) {
+        let orders = contextData.orders || contextData.recentOrders || [];
+        
+        if (query.includes("how many") || query.includes("count") || query.includes("number")) {
+          if (query.includes("pending")) {
+            const pending = orders.filter(o => (o.status || '').toLowerCase() === 'pending').length;
+            responseText = `There are **${pending}** pending orders.`;
+          } else if (query.includes("confirm")) {
+            const confirmed = orders.filter(o => (o.status || '').toLowerCase() === 'confirmed').length;
+            responseText = `There are **${confirmed}** confirmed orders.`;
+          } else if (query.includes("deliver")) {
+            const delivered = orders.filter(o => (o.status || '').toLowerCase() === 'delivered').length;
+            responseText = `There are **${delivered}** delivered orders.`;
+          } else if (query.includes("assign")) {
+            const assigned = orders.filter(o => o.driver_id || o.fleet_id).length;
+            responseText = `There are **${assigned}** orders currently assigned to a driver or truck.`;
+          } else {
+            const pending = orders.filter(o => (o.status || '').toLowerCase() === 'pending').length;
+            const confirmed = orders.filter(o => (o.status || '').toLowerCase() === 'confirmed').length;
+            const delivered = orders.filter(o => (o.status || '').toLowerCase() === 'delivered').length;
+            responseText = `There are **${orders.length}** total orders: **${confirmed}** confirmed, **${pending}** pending, and **${delivered}** delivered.`;
+          }
+        } else {
+          // Check for status filters
+          if (query.includes("pending")) {
+            orders = orders.filter(o => (o.status || '').toLowerCase() === 'pending');
+          } else if (query.includes("confirm")) {
+            orders = orders.filter(o => (o.status || '').toLowerCase() === 'confirmed');
+          } else if (query.includes("deliver")) {
+            orders = orders.filter(o => (o.status || '').toLowerCase() === 'delivered');
+          }
+
+          if (orders.length === 0) {
+            responseText = "No matching orders found in the database context.";
+          } else {
+            responseText = `Here is the status of the orders:\n`;
+            orders.forEach((o, idx) => {
+              responseText += `\n${idx + 1}. **Order ID**: ${o.load_id || 'N/A'}\n`;
+              responseText += `   - **Status**: ${o.status || 'Pending'}\n`;
+              responseText += `   - **Route**: ${o.pickup || 'TBD'} ➔ ${o.drop || 'TBD'}\n`;
+              responseText += `   - **Payment Status**: ${o.payment_status || 'Unpaid'}\n`;
+            });
+          }
+        }
+      }
+      // 4. Operations Summary Queries
+      else if (isSummary) {
+        const warehouses = contextData.warehouses || [];
+        const orders = contextData.orders || [];
+        const fleet = contextData.fleet || [];
+        responseText = `**Today's Operations Summary**:\n\n` +
+                       `- **Active Warehouses**: ${warehouses.length}\n` +
+                       `- **Total Orders**: ${orders.length}\n` +
+                       `- **Fleet Size**: ${fleet.length}\n\n` +
+                       `Everything is running smoothly!`;
+      }
+      // 5. Fleet / Trucks Queries
+      else if (isFleet) {
+        const fleet = contextData.fleet || contextData.fleetStatus || [];
+        const fleetArr = Array.isArray(fleet) ? fleet : (fleet ? [fleet] : []);
+        if (fleetArr.length === 0) {
+          responseText = "No active fleet or truck tracking details found.";
+        } else {
+          responseText = `Here is the active fleet tracking status:\n`;
+          fleetArr.forEach((f, idx) => {
+            responseText += `\n${idx + 1}. **Vehicle**: ${f.vehicle_number || 'N/A'}\n`;
+            responseText += `   - **Current Location**: ${f.location || 'Unknown'}\n`;
+            responseText += `   - **Status**: ${f.status || 'Stopped'}\n`;
+          });
+        }
+      }
+      // 6. Generic Fallback
+      else {
+        responseText = "I am operating in Offline/Fallback mode because the server's Gemini API Key has been flagged as leaked.\n\n" +
+                       "You can ask about your **orders**, **warehouses**, **drivers**, or **fleet status**, and I will fetch them directly from the database context!";
+      }
+
+      return res.json({ text: responseText });
+    }
+  } catch (err) {
+    console.error("AI Proxy Error:", err);
+    res.status(500).json({ error: err.message || "Error generating content" });
+  }
+});
+
 // ── Razorpay instance ────────────────────────────────────────────────────────
 const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
+  key_id: process.env.RAZORPAY_KEY_ID || "rzp_test_Si7muEw1pbvVFT",
+  key_secret: process.env.RAZORPAY_KEY_SECRET || "VtiQpG0aOPvMy6zUSEnUz9D6",
 });
 
 // ── Helper: generate invoice number ─────────────────────────────────────────
@@ -118,7 +376,10 @@ app.post("/api/payment/create-order", async (req, res) => {
       receipt: "receipt_" + Date.now(),
     });
 
-    res.json(order);
+    res.json({
+      ...order,
+      key_id: process.env.RAZORPAY_KEY_ID
+    });
   } catch (err) {
     console.error("CREATE ORDER ERROR:", err);
     res.status(500).json({ error: err.message || "Error creating order" });

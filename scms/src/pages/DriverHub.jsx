@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { UserCheck, Truck, Coffee, IndianRupee, CheckCircle, BarChart3, MapPin, Navigation, Clock, Camera, Leaf, Loader2, X, Compass, Shield, AlertTriangle, Flag, Ban, XCircle, Check } from 'lucide-react';
+import { UserCheck, Truck, Coffee, IndianRupee, CheckCircle, BarChart3, MapPin, Navigation, Clock, Camera, Leaf, Loader2, X, Compass, Shield, AlertTriangle, Flag, Ban, XCircle, Check, PackageOpen, Map, SearchX } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 import supabase from '../config/SupabaseClient';
+import EmptyState from '../components/EmptyState';
 
 const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
 

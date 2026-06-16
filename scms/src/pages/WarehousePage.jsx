@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { AlertTriangle, Activity, RefreshCw } from 'lucide-react';
+import { AlertTriangle, Activity, RefreshCw, Building2, TrendingUp, Search, ArrowUpDown, X, SearchX } from 'lucide-react';
 import supabase from '../config/SupabaseClient';
+import EmptyState, { getFriendlyError } from '../components/EmptyState';
 import useWarehouseMonitor from '../hooks/useWarehouseMonitor';
 import WarehouseMap from '../components/WarehouseMap';
 import axios from 'axios';

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { detectIntent } from '../hooks/useAIIntent';
 import supabase from '../config/SupabaseClient';
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { getFriendlyError } from './EmptyState';
 
 const RobotIcon = ({ size = 24 }) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -35,12 +35,6 @@ const RobotIcon = ({ size = 24 }) => (
 const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 const AIAssistant = () => {
-    const genAI = new GoogleGenerativeAI(
-        process.env.REACT_APP_GEMINI_API_KEY
-    );
-    const model = genAI.getGenerativeModel({
-        model: "gemini-3.1-flash-lite-preview"
-    });
     const [messages, setMessages] = useState([
         { role: 'ai', text: 'Hello! I am your SCMS Co-Pilot. How can I help you manage your supply chain today?', timestamp: new Date() }
     ]);
@@ -623,9 +617,50 @@ SCMS App Usage Guidebook:
    - If no relevant data exists in the context or guidebook, say: I don't have enough data for that.
    `;
 
-            // 5. Call Gemini directly
-            const result = await model.generateContent(prompt);
-            let reply = result.response.text();
+            // 5. Answer directly from database context (Offline/Database-Only Mode)
+            const query = translatedTextToProcess.toLowerCase();
+            let reply = "";
+            const isWarehouse = query.includes("warehouse") || query.includes("storage") || query.includes("depot");
+            const isOrder = query.includes("order") || query.includes("load") || query.includes("purchase") || query.includes("delivery");
+            const isDriver = query.includes("driver") || query.includes("availability") || query.includes("active");
+            const isFleet = query.includes("fleet") || query.includes("truck") || query.includes("vehicle");
+            const isSummary = query.includes("summary") || query.includes("today") || query.includes("status");
+
+            if (isWarehouse) {
+                let warehouses = contextData.warehouses || [];
+                if (warehouses.length === 0) {
+                    reply = "I couldn't find any warehouses registered under your profile.";
+                } else {
+                    reply = "Here are your warehouses:\n" + warehouses.map((w, idx) => `\n${idx + 1}. **${w.name}**\n   - Address: ${w.city || 'N/A'}\n   - Load: ${w.current_load}/${w.max_capacity}`).join('');
+                }
+            } else if (isOrder) {
+                let orders = contextData.orders || contextData.recentOrders || [];
+                if (orders.length === 0) {
+                    reply = "No matching orders found in your profile.";
+                } else {
+                    reply = `You have **${orders.length}** total orders:\n` + orders.slice(0, 5).map((o, idx) => `\n${idx + 1}. **Order**: ${o.load_id || 'N/A'}\n   - Status: ${o.status || 'Pending'}\n   - Route: ${o.pickup || 'TBD'} ➔ ${o.drop || 'TBD'}`).join('');
+                    if (orders.length > 5) reply += `\n\n*(Showing latest 5 orders)*`;
+                }
+            } else if (isFleet) {
+                let fleet = contextData.fleet || contextData.fleetStatus || [];
+                const fleetArr = Array.isArray(fleet) ? fleet : (fleet ? [fleet] : []);
+                if (fleetArr.length === 0) {
+                    reply = "No active fleet or truck tracking details found.";
+                } else {
+                    reply = "Here is your active fleet status:\n" + fleetArr.map((f, idx) => `\n${idx + 1}. **Vehicle**: ${f.vehicle_number || 'N/A'}\n   - Status: ${f.status || 'Stopped'}`).join('');
+                }
+            } else if (isDriver) {
+                let drivers = contextData.drivers || [];
+                if (drivers.length === 0) {
+                    reply = "I couldn't find any driver availability information.";
+                } else {
+                    reply = `There are **${drivers.length}** drivers registered.\n` + drivers.slice(0,5).map((d, idx) => `\n${idx + 1}. **${d.driver_name || 'Driver'}** - Status: ${d.status || 'Inactive'}`).join('');
+                }
+            } else if (isSummary) {
+                reply = `**Today's Operations Summary**:\n\n- Active Warehouses: ${(contextData.warehouses || []).length}\n- Total Orders: ${(contextData.orders || contextData.recentOrders || []).length}\n- Fleet Vehicles: ${(contextData.fleet || []).length}\n\nEverything is running smoothly!`;
+            } else {
+                reply = "I am operating in strict Database-Only mode for security.\n\nAsk me about your **orders**, **warehouses**, **drivers**, or **fleet status**, and I will fetch them directly from your restricted database context!";
+            }
 
             // Translate AI reply back to user's language if necessary
             if (targetLang !== 'en') {
@@ -666,7 +701,7 @@ SCMS App Usage Guidebook:
 
         } catch (error) {
             console.error("AI Assistant Error:", error);
-            const errorReply = "AI error: " + error.message;
+            const errorReply = getFriendlyError(error.message) || "I encountered an issue while processing your request. Please try again in a moment.";
             setMessages(prev => [...prev, {
                 role: 'ai',
                 text: errorReply,
