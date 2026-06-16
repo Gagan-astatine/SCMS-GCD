@@ -118,7 +118,10 @@ app.post("/api/payment/create-order", async (req, res) => {
       receipt: "receipt_" + Date.now(),
     });
 
-    res.json(order);
+    res.json({
+      ...order,
+      key_id: process.env.RAZORPAY_KEY_ID
+    });
   } catch (err) {
     console.error("CREATE ORDER ERROR:", err);
     res.status(500).json({ error: err.message || "Error creating order" });
