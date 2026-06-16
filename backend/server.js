@@ -38,6 +38,14 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
+// ── Google API Routes ────────────────────────────────────────────────────────
+const speechRoutes = require('./routes/speechRoutes');
+const translationRoutes = require('./routes/translationRoutes');
+const visionRoutes = require('./routes/visionRoutes');
+app.use('/api/speech', speechRoutes);
+app.use('/api/translate', translationRoutes);
+app.use('/api/vision', visionRoutes);
+
 // ── Razorpay instance ────────────────────────────────────────────────────────
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -48,7 +56,7 @@ const razorpay = new Razorpay({
 const generateInvoiceNumber = () => {
   const now = new Date();
   const year = now.getFullYear();
-  const ms   = Date.now().toString().slice(-6); // last 6 digits of timestamp
+  const ms = Date.now().toString().slice(-6); // last 6 digits of timestamp
   return `INV-${year}-${ms}`;
 };
 
@@ -166,12 +174,12 @@ app.post("/api/payment/verify", async (req, res) => {
     const invoiceNumber = generateInvoiceNumber();
 
     const { error: invError } = await supabase.from("invoices").insert([{
-      load_id:              order_id || null,
-      buyer_id:             user_id  || null,
+      load_id: order_id || null,
+      buyer_id: user_id || null,
       razorpay_order_id,
       razorpay_payment_id,
       amount,
-      invoice_number:       invoiceNumber,
+      invoice_number: invoiceNumber,
     }]);
 
     if (invError) {
@@ -182,8 +190,8 @@ app.post("/api/payment/verify", async (req, res) => {
     // ── Step 4: Update Load row status (non-fatal if it fails) ──────────────
     if (order_id) {
       const updatePayload = {
-        status:          "Confirmed",
-        payment_status:  "paid"
+        status: "Confirmed",
+        payment_status: "paid"
       };
 
       const { error: loadError } = await supabase
@@ -237,7 +245,7 @@ app.post("/api/warehouse/reroute", async (req, res) => {
         .select("name")
         .eq("id", toWarehouseId)
         .single();
-      
+
       if (whData?.name) {
         const { error: loadError } = await supabase
           .from("Load")
@@ -258,9 +266,9 @@ app.post("/api/warehouse/reroute", async (req, res) => {
     const { error: rerouteError } = await supabase
       .from("truck_reroutes")
       .insert([{
-        fleet_id:          validFleetId,
+        fleet_id: validFleetId,
         from_warehouse_id: fromWarehouseId,
-        to_warehouse_id:   toWarehouseId,
+        to_warehouse_id: toWarehouseId,
         reason,
       }]);
 
@@ -271,8 +279,8 @@ app.post("/api/warehouse/reroute", async (req, res) => {
       .from("warehouse_logs")
       .insert([{
         warehouse_id: fromWarehouseId,
-        event_type:   "reroute",
-        message:      `Truck ${truckId} rerouted to ${toWarehouseId}. Reason: ${reason}`,
+        event_type: "reroute",
+        message: `Truck ${truckId} rerouted to ${toWarehouseId}. Reason: ${reason}`,
       }]);
 
     if (logError) throw logError;
@@ -648,18 +656,18 @@ async function getCoords(locationStr) {
   if (!locationStr) return null;
   const cleanedStr = locationStr.trim();
   const lowerStr = cleanedStr.toLowerCase();
-  
+
   // 1. Parse coordinate strings like "12.9716, 77.5946" or "12.9716 77.5946"
   const coordRegex = /^\s*(-?\d+(?:\.\d+)?)\s*[\s,]\s*(-?\d+(?:\.\d+)?)\s*$/;
   const match = cleanedStr.match(coordRegex);
   if (match) {
     return [parseFloat(match[1]), parseFloat(match[2])];
   }
-  
+
   // 2. Check cache
   const cached = geocodeCache.get(lowerStr);
   if (cached) return cached;
-  
+
   // 3. Database lookup for warehouse names
   // Extract main name in case of "Central Warehouse – Bangalore"
   const cleanName = cleanedStr.split(/[–-]/)[0].trim();
@@ -677,7 +685,7 @@ async function getCoords(locationStr) {
   } catch (e) {
     console.warn("DB warehouse check bypassed or failed:", e.message);
   }
-  
+
   // 4. Geocode using Nominatim API
   const query = cleanedStr.toLowerCase().includes("india") ? cleanedStr : `${cleanedStr}, India`;
   const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}`;
@@ -696,7 +704,7 @@ async function getCoords(locationStr) {
   } catch (err) {
     console.error("Nominatim geocoding error:", err.message);
   }
-  
+
   // 5. Fallback dictionary for major hubs
   if (lowerStr.includes("mumbai")) return [19.0760, 72.8777];
   if (lowerStr.includes("pune")) return [18.5204, 73.8567];
@@ -707,7 +715,7 @@ async function getCoords(locationStr) {
   if (lowerStr.includes("kolkata")) return [22.5726, 88.3639];
   if (lowerStr.includes("ahmedabad")) return [23.0225, 72.5714];
   if (lowerStr.includes("jaipur")) return [26.9124, 75.7873];
-  
+
   return null;
 }
 
@@ -718,24 +726,24 @@ app.get("/api/route/optimize", async (req, res) => {
     if (!pickup || !drop) {
       return res.status(400).json({ error: "pickup and drop query parameters are required" });
     }
-    
+
     const pickupCoords = await getCoords(pickup);
     const dropCoords = await getCoords(drop);
-    
+
     if (!pickupCoords || !dropCoords) {
       return res.status(404).json({ error: "Failed to resolve coordinates for pickup or drop location." });
     }
-    
+
     // OSRM expects coordinates as lon,lat;lon,lat
     const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${pickupCoords[1]},${pickupCoords[0]};${dropCoords[1]},${dropCoords[0]}?overview=full&geometries=geojson`;
-    
+
     const osrmRes = await fetch(osrmUrl);
     const osrmData = await osrmRes.json();
-    
+
     if (osrmData.code !== 'Ok' || !osrmData.routes || osrmData.routes.length === 0) {
       return res.status(502).json({ error: "Failed to calculate road route from routing engine." });
     }
-    
+
     const route = osrmData.routes[0];
     const distanceKm = route.distance / 1000;
 
