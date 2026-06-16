@@ -79,11 +79,9 @@ app.post("/api/ai/chat", async (req, res) => {
         if (contextMatch) {
           contextData = JSON.parse(contextMatch[1]);
         }
-        const questionMatch = prompt.match(/User question:\s*([\s\S]*)/i);
+        const questionMatch = prompt.match(/User question:\s*([\s\S]*?)\s*(?:Rules:|$)/i);
         if (questionMatch) {
-          // Remove rules/guidebook text if captured
-          const cleanQuestion = questionMatch[1].split("\n\nRules:")[0].trim();
-          userQuestion = cleanQuestion;
+          userQuestion = questionMatch[1].trim();
         }
         const roleMatch = prompt.match(/The user's role is:\s*(.*)/i);
         if (roleMatch) {
@@ -125,7 +123,7 @@ app.post("/api/ai/chat", async (req, res) => {
                        `Everything is running smoothly!`;
       }
       // 3. Check for orders / loads query
-      else if (query.includes("order") || query.includes("load") || query.includes("purchase")) {
+      else if (query.includes("order") || query.includes("oder") || query.includes("load") || query.includes("purchase")) {
         const orders = contextData.orders || contextData.recentOrders || [];
         if (orders.length === 0) {
           responseText = "You do not have any active or historical orders assigned to your account currently.";
