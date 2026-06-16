@@ -617,18 +617,50 @@ SCMS App Usage Guidebook:
    - If no relevant data exists in the context or guidebook, say: I don't have enough data for that.
    `;
 
-            // 5. Call Gemini via Backend Proxy
-            const aiRes = await fetch(`${API}/api/ai/chat`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt })
-            });
-            if (!aiRes.ok) {
-                const errData = await aiRes.json();
-                throw new Error(errData.error || "Failed to generate content from AI");
+            // 5. Answer directly from database context (Offline/Database-Only Mode)
+            const query = translatedTextToProcess.toLowerCase();
+            let reply = "";
+            const isWarehouse = query.includes("warehouse") || query.includes("storage") || query.includes("depot");
+            const isOrder = query.includes("order") || query.includes("load") || query.includes("purchase") || query.includes("delivery");
+            const isDriver = query.includes("driver") || query.includes("availability") || query.includes("active");
+            const isFleet = query.includes("fleet") || query.includes("truck") || query.includes("vehicle");
+            const isSummary = query.includes("summary") || query.includes("today") || query.includes("status");
+
+            if (isWarehouse) {
+                let warehouses = contextData.warehouses || [];
+                if (warehouses.length === 0) {
+                    reply = "I couldn't find any warehouses registered under your profile.";
+                } else {
+                    reply = "Here are your warehouses:\n" + warehouses.map((w, idx) => `\n${idx + 1}. **${w.name}**\n   - Address: ${w.city || 'N/A'}\n   - Load: ${w.current_load}/${w.max_capacity}`).join('');
+                }
+            } else if (isOrder) {
+                let orders = contextData.orders || contextData.recentOrders || [];
+                if (orders.length === 0) {
+                    reply = "No matching orders found in your profile.";
+                } else {
+                    reply = `You have **${orders.length}** total orders:\n` + orders.slice(0, 5).map((o, idx) => `\n${idx + 1}. **Order**: ${o.load_id || 'N/A'}\n   - Status: ${o.status || 'Pending'}\n   - Route: ${o.pickup || 'TBD'} ➔ ${o.drop || 'TBD'}`).join('');
+                    if (orders.length > 5) reply += `\n\n*(Showing latest 5 orders)*`;
+                }
+            } else if (isFleet) {
+                let fleet = contextData.fleet || contextData.fleetStatus || [];
+                const fleetArr = Array.isArray(fleet) ? fleet : (fleet ? [fleet] : []);
+                if (fleetArr.length === 0) {
+                    reply = "No active fleet or truck tracking details found.";
+                } else {
+                    reply = "Here is your active fleet status:\n" + fleetArr.map((f, idx) => `\n${idx + 1}. **Vehicle**: ${f.vehicle_number || 'N/A'}\n   - Status: ${f.status || 'Stopped'}`).join('');
+                }
+            } else if (isDriver) {
+                let drivers = contextData.drivers || [];
+                if (drivers.length === 0) {
+                    reply = "I couldn't find any driver availability information.";
+                } else {
+                    reply = `There are **${drivers.length}** drivers registered.\n` + drivers.slice(0,5).map((d, idx) => `\n${idx + 1}. **${d.driver_name || 'Driver'}** - Status: ${d.status || 'Inactive'}`).join('');
+                }
+            } else if (isSummary) {
+                reply = `**Today's Operations Summary**:\n\n- Active Warehouses: ${(contextData.warehouses || []).length}\n- Total Orders: ${(contextData.orders || contextData.recentOrders || []).length}\n- Fleet Vehicles: ${(contextData.fleet || []).length}\n\nEverything is running smoothly!`;
+            } else {
+                reply = "I am operating in strict Database-Only mode for security.\n\nAsk me about your **orders**, **warehouses**, **drivers**, or **fleet status**, and I will fetch them directly from your restricted database context!";
             }
-            const aiData = await aiRes.json();
-            let reply = aiData.text;
 
             // Translate AI reply back to user's language if necessary
             if (targetLang !== 'en') {
