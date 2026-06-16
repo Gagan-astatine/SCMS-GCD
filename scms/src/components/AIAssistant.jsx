@@ -36,12 +36,6 @@ const RobotIcon = ({ size = 24 }) => (
 const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 const AIAssistant = () => {
-    const genAI = new GoogleGenerativeAI(
-        process.env.REACT_APP_GEMINI_API_KEY
-    );
-    const model = genAI.getGenerativeModel({
-        model: "gemini-3.1-flash-lite-preview"
-    });
     const [messages, setMessages] = useState([
         { role: 'ai', text: 'Hello! I am your SCMS Co-Pilot. How can I help you manage your supply chain today?', timestamp: new Date() }
     ]);
@@ -624,9 +618,18 @@ SCMS App Usage Guidebook:
    - If no relevant data exists in the context or guidebook, say: I don't have enough data for that.
    `;
 
-            // 5. Call Gemini directly
-            const result = await model.generateContent(prompt);
-            let reply = result.response.text();
+            // 5. Call Gemini via Backend Proxy
+            const aiRes = await fetch(`${API}/api/ai/chat`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt })
+            });
+            if (!aiRes.ok) {
+                const errData = await aiRes.json();
+                throw new Error(errData.error || "Failed to generate content from AI");
+            }
+            const aiData = await aiRes.json();
+            let reply = aiData.text;
 
             // Translate AI reply back to user's language if necessary
             if (targetLang !== 'en') {

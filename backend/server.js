@@ -5,6 +5,7 @@ const express = require("express");
 const Razorpay = require("razorpay");
 const cors = require("cors");
 const crypto = require("crypto");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { createClient } = require("@supabase/supabase-js");
 
 const supabase = createClient(
@@ -45,6 +46,27 @@ const visionRoutes = require('./routes/visionRoutes');
 app.use('/api/speech', speechRoutes);
 app.use('/api/translate', translationRoutes);
 app.use('/api/vision', visionRoutes);
+
+// ── Secure AI Proxy Route ───────────────────────────────────────────────────
+app.post("/api/ai/chat", async (req, res) => {
+  try {
+    const { prompt } = req.body;
+    if (!prompt) {
+      return res.status(400).json({ error: "Prompt is required" });
+    }
+
+    const geminiKey = process.env.GEMINI_API_KEY || "AIzaSyBwuLymlOnQKa6fDuQ6J8xNldCAzep8J1w";
+    const genAI = new GoogleGenerativeAI(geminiKey);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+    res.json({ text });
+  } catch (err) {
+    console.error("AI Proxy Error:", err);
+    res.status(500).json({ error: err.message || "Error generating content" });
+  }
+});
 
 // ── Razorpay instance ────────────────────────────────────────────────────────
 const razorpay = new Razorpay({
