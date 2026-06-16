@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { detectIntent } from '../hooks/useAIIntent';
 import supabase from '../config/SupabaseClient';
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getFriendlyError } from './EmptyState';
 
 const RobotIcon = ({ size = 24 }) => (

@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import supabase from "../config/SupabaseClient"
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import {
     BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
     PieChart, Pie, Cell, CartesianGrid, Legend, AreaChart, Area
 } from 'recharts';
 import { Activity, AlertTriangle, Flame, PackageCheck, Route, Timer, Truck, Warehouse } from 'lucide-react';
 import KineticLoader from '../components/KineticLoader';
+
+const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 const BackgroundShader = () => {
     useEffect(() => {
@@ -514,9 +515,6 @@ const AnalyticsPage = () => {
         if (!data || data.warehouses.length === 0) return;
         setAiLoading(true);
         try {
-            const genAI = new GoogleGenerativeAI(process.env.REACT_APP_GEMINI_API_KEY);
-            const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite-preview" });
-            
             const summaryData = {
                 totalWarehouses: data.warehouses.length,
                 overflowingWarehouses: data.warehouses.filter(w => ((w.current_load + (w.reserved_space || 0)) / (w.max_capacity || 1)) > 0.85).length,
@@ -528,13 +526,37 @@ const AnalyticsPage = () => {
 
             const prompt = `You are an expert supply chain analyst. Based on this real-time SCMS data: ${JSON.stringify(summaryData)}, provide 3 short, highly actionable bullet points of insights or recommendations. Keep it concise. Focus on operational bottlenecks if any. Format as simple HTML (just <ul> and <li>, no markdown blocks).`;
             
-            const result = await model.generateContent(prompt);
-            let text = result.response.text();
-            text = text.replace(/```html/g, '').replace(/```/g, ''); 
+            const aiRes = await fetch(`${API}/api/ai/chat`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt })
+            });
+            if (!aiRes.ok) {
+                const errData = await aiRes.json();
+                throw new Error(errData.error || "Failed to generate AI insights");
+            }
+            const aiData = await aiRes.json();
+            let text = aiData.text;
+            text = text.replace(/```html/g, '').replace(/```/g, '').trim(); 
             setAiInsights(text);
         } catch (error) {
             console.error("Failed to generate AI insights", error);
-            setAiInsights(`<p style='color: #ef4444;'>Failed to load AI insights. Error: ${error.message || error.toString()}</p>`);
+            const summaryData = {
+                totalWarehouses: data.warehouses.length,
+                overflowingWarehouses: data.warehouses.filter(w => ((w.current_load + (w.reserved_space || 0)) / (w.max_capacity || 1)) > 0.85).length,
+                totalOrders: data.orders.length,
+                pendingOrders: data.orders.filter(o => o.status === 'Pending').length,
+                totalTrucks: data.fleet.length,
+                activeTrucks: data.fleet.filter(t => t.vehicle_status === true || t.vehicle_status === 'true').length,
+            };
+            const fallbackHTML = `
+                <ul>
+                    <li><strong>Warehouse Load:</strong> ${summaryData.overflowingWarehouses} of ${summaryData.totalWarehouses} warehouses are exceeding 85% capacity.</li>
+                    <li><strong>Order Backlog:</strong> Currently managing ${summaryData.pendingOrders} pending orders out of ${summaryData.totalOrders} total.</li>
+                    <li><strong>Fleet Status:</strong> ${summaryData.activeTrucks} of ${summaryData.totalTrucks} delivery trucks are active.</li>
+                </ul>
+            `;
+            setAiInsights(fallbackHTML);
         } finally {
             setAiLoading(false);
         }
