@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { detectIntent } from '../hooks/useAIIntent';
 import supabase from '../config/SupabaseClient';
 import { getFriendlyError } from './EmptyState';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const RobotIcon = ({ size = 24 }) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -35,6 +36,12 @@ const RobotIcon = ({ size = 24 }) => (
 const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 const AIAssistant = () => {
+    const genAI = new GoogleGenerativeAI(
+        process.env.REACT_APP_GEMINI_API_KEY
+    );
+    const model = genAI.getGenerativeModel({
+        model: "gemini-3.1-flash-lite-preview"
+    });
     const [messages, setMessages] = useState([
         { role: 'ai', text: 'Hello! I am your SCMS Co-Pilot. How can I help you manage your supply chain today?', timestamp: new Date() }
     ]);
@@ -89,7 +96,7 @@ const AIAssistant = () => {
         });
     };
 
-    const loadSession = async (sId) => {
+    const loadSession = async (sId, uId = userId) => {
         setCurrentSessionId(sId);
         setLoading(true);
         let query = supabase.from('chat_history').select('*');
@@ -98,6 +105,7 @@ const AIAssistant = () => {
         } else {
             query = query.eq('session_id', sId);
         }
+        if (uId) query = query.eq('user_id', uId);
         const { data, error } = await query.order('created_at', { ascending: true });
         setLoading(false);
         if (error) {
@@ -485,7 +493,7 @@ const AIAssistant = () => {
                                 const data = await res.json();
                                 warehouses = data.warehouses || [];
                             }
-                        } catch (e) {}
+                        } catch (e) { }
 
                         contextData = {
                             orders: ordersList,
@@ -532,43 +540,66 @@ const AIAssistant = () => {
                         };
                     }
                 } else {
-                    // Seller / Owner (Original full access queries)
+                    // Seller / Owner (Restricted access queries)
+                    const { data: sellerOrders } = await supabase.from("Load").select("*").eq("seller_id", userId);
+                    const ordersList = sellerOrders || [];
+                    const fleetIds = ordersList.map(o => o.fleet_id).filter(Boolean);
+                    const orderIds = ordersList.map(o => o.load_id).filter(Boolean);
+
                     if (intent === "warehouses") {
                         const { data } = await supabase.from("warehouses").select("*");
                         contextData = { warehouses: data || [] };
                     } else if (intent === "orders") {
-                        const { data } = await supabase.from("Load").select("*").limit(30);
-                        contextData = { orders: data || [] };
+                        contextData = { orders: ordersList };
                     } else if (intent === "logs") {
                         const { data } = await supabase.from("warehouse_logs").select("*").limit(15);
                         contextData = { logs: data || [] };
                     } else if (intent === "fleet") {
-                        const { data } = await supabase.from("Fleet").select("*");
-                        contextData = { fleet: data || [] };
+                        let fleet = [];
+                        if (fleetIds.length > 0) {
+                            const { data } = await supabase.from("Fleet").select("*").in("id", fleetIds);
+                            fleet = data || [];
+                        }
+                        contextData = { fleet };
                     } else if (intent === "drivers") {
                         const { data } = await supabase.from("driver").select("*");
                         const { data: eData } = await supabase.from("driver_earnings").select("*").limit(10);
                         contextData = { drivers: data || [], driver_earnings_sample: eData || [] };
                     } else if (intent === "payments") {
-                        const { data } = await supabase.from("payments").select("*").limit(20);
-                        contextData = { payments: data || [] };
+                        let payments = [];
+                        if (orderIds.length > 0) {
+                            const { data } = await supabase.from("payments").select("*").in("order_id", orderIds);
+                            payments = data || [];
+                        }
+                        contextData = { payments };
                     } else if (intent === "reroutes") {
-                        const { data } = await supabase.from("truck_reroutes").select("*");
-                        contextData = { reroutes: data || [] };
+                        let reroutes = [];
+                        if (fleetIds.length > 0) {
+                            const { data } = await supabase.from("truck_reroutes").select("*").in("fleet_id", fleetIds);
+                            reroutes = data || [];
+                        }
+                        contextData = { reroutes };
                     } else if (intent === "all") {
-                        const [w, l, f, d, p] = await Promise.all([
-                            supabase.from("warehouses").select("*"),
-                            supabase.from("Load").select("*").limit(10),
-                            supabase.from("Fleet").select("*"),
-                            supabase.from("driver").select("*"),
-                            supabase.from("payments").select("*").limit(5)
-                        ]);
+                        let fleet = [], payments = [], reroutes = [];
+                        if (fleetIds.length > 0) {
+                            const { data: fData } = await supabase.from("Fleet").select("*").in("id", fleetIds);
+                            fleet = fData || [];
+                            const { data: rData } = await supabase.from("truck_reroutes").select("*").in("fleet_id", fleetIds);
+                            reroutes = rData || [];
+                        }
+                        if (orderIds.length > 0) {
+                            const { data: pData } = await supabase.from("payments").select("*").in("order_id", orderIds);
+                            payments = pData || [];
+                        }
+                        const { data: w } = await supabase.from("warehouses").select("*");
+                        const { data: d } = await supabase.from("driver").select("*");
                         contextData = {
-                            warehouses: w.data || [],
-                            recentOrders: l.data || [],
-                            fleetStatus: f.data || [],
-                            drivers: d.data || [],
-                            recentPayments: p.data || []
+                            warehouses: w || [],
+                            orders: ordersList,
+                            fleetStatus: fleet,
+                            drivers: d || [],
+                            recentPayments: payments,
+                            reroutes: reroutes
                         };
                     }
                 }
@@ -611,56 +642,15 @@ SCMS App Usage Guidebook:
    - If they ask how to use the app or how to complete tasks, guide them clearly using the App usage guidebook.
    - Give a direct one-line answer first.
    - Then bullet points with details.
-   - End with one role-specific recommendation.
+   - End with one role-specific recommendation and a proper statistical suggestion based on the data.
    - Keep under 150 words.
    - Only use data from context and the guidebook. Do not make up orders or fleets.
    - If no relevant data exists in the context or guidebook, say: I don't have enough data for that.
    `;
 
-            // 5. Answer directly from database context (Offline/Database-Only Mode)
-            const query = translatedTextToProcess.toLowerCase();
-            let reply = "";
-            const isWarehouse = query.includes("warehouse") || query.includes("storage") || query.includes("depot");
-            const isOrder = query.includes("order") || query.includes("load") || query.includes("purchase") || query.includes("delivery");
-            const isDriver = query.includes("driver") || query.includes("availability") || query.includes("active");
-            const isFleet = query.includes("fleet") || query.includes("truck") || query.includes("vehicle");
-            const isSummary = query.includes("summary") || query.includes("today") || query.includes("status");
-
-            if (isWarehouse) {
-                let warehouses = contextData.warehouses || [];
-                if (warehouses.length === 0) {
-                    reply = "I couldn't find any warehouses registered under your profile.";
-                } else {
-                    reply = "Here are your warehouses:\n" + warehouses.map((w, idx) => `\n${idx + 1}. **${w.name}**\n   - Address: ${w.city || 'N/A'}\n   - Load: ${w.current_load}/${w.max_capacity}`).join('');
-                }
-            } else if (isOrder) {
-                let orders = contextData.orders || contextData.recentOrders || [];
-                if (orders.length === 0) {
-                    reply = "No matching orders found in your profile.";
-                } else {
-                    reply = `You have **${orders.length}** total orders:\n` + orders.slice(0, 5).map((o, idx) => `\n${idx + 1}. **Order**: ${o.load_id || 'N/A'}\n   - Status: ${o.status || 'Pending'}\n   - Route: ${o.pickup || 'TBD'} ➔ ${o.drop || 'TBD'}`).join('');
-                    if (orders.length > 5) reply += `\n\n*(Showing latest 5 orders)*`;
-                }
-            } else if (isFleet) {
-                let fleet = contextData.fleet || contextData.fleetStatus || [];
-                const fleetArr = Array.isArray(fleet) ? fleet : (fleet ? [fleet] : []);
-                if (fleetArr.length === 0) {
-                    reply = "No active fleet or truck tracking details found.";
-                } else {
-                    reply = "Here is your active fleet status:\n" + fleetArr.map((f, idx) => `\n${idx + 1}. **Vehicle**: ${f.vehicle_number || 'N/A'}\n   - Status: ${f.status || 'Stopped'}`).join('');
-                }
-            } else if (isDriver) {
-                let drivers = contextData.drivers || [];
-                if (drivers.length === 0) {
-                    reply = "I couldn't find any driver availability information.";
-                } else {
-                    reply = `There are **${drivers.length}** drivers registered.\n` + drivers.slice(0,5).map((d, idx) => `\n${idx + 1}. **${d.driver_name || 'Driver'}** - Status: ${d.status || 'Inactive'}`).join('');
-                }
-            } else if (isSummary) {
-                reply = `**Today's Operations Summary**:\n\n- Active Warehouses: ${(contextData.warehouses || []).length}\n- Total Orders: ${(contextData.orders || contextData.recentOrders || []).length}\n- Fleet Vehicles: ${(contextData.fleet || []).length}\n\nEverything is running smoothly!`;
-            } else {
-                reply = "I am operating in strict Database-Only mode for security.\n\nAsk me about your **orders**, **warehouses**, **drivers**, or **fleet status**, and I will fetch them directly from your restricted database context!";
-            }
+            // 5. Call Gemini directly
+            const result = await model.generateContent(prompt);
+            let reply = result.response.text();
 
             // Translate AI reply back to user's language if necessary
             if (targetLang !== 'en') {
@@ -701,7 +691,7 @@ SCMS App Usage Guidebook:
 
         } catch (error) {
             console.error("AI Assistant Error:", error);
-            const errorReply = getFriendlyError(error.message) || "I encountered an issue while processing your request. Please try again in a moment.";
+            const errorReply = "AI Error: " + error.message;
             setMessages(prev => [...prev, {
                 role: 'ai',
                 text: errorReply,

@@ -87,7 +87,13 @@ textarea:not([class]) {
   border-color: var(--border-input) !important;
 }
 
+/* Hide Google Translate top banner that blocks navbar */
+.goog-te-banner-frame.skiptranslate {
+  display: none !important;
+}
+
 body {
+  top: 0px !important;
   margin: 0;
   font-family: 'Plus Jakarta Sans', 'Nunito', 'Oswald', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',

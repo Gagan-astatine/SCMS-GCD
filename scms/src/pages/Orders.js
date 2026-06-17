@@ -298,6 +298,8 @@ const Orders = () => {
         .neq('status', 'cancelled');
     } else if (currentRole === 'buyer') {
       query = query.eq('buyer_id', userId)
+    } else if (currentRole === 'seller') {
+      query = query.eq('seller_id', userId)
     }
 
     const { data: loads, error: loadError } = await query
