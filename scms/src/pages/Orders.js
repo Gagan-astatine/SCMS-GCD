@@ -54,7 +54,7 @@ const Orders = () => {
 
   // Card toggle state
   const [expandedCards, setExpandedCards] = useState(new Set())
-  
+
   const toggleCardExpansion = (id) => {
     setExpandedCards(prev => {
       const next = new Set(prev);
@@ -298,6 +298,8 @@ const Orders = () => {
         .neq('status', 'cancelled');
     } else if (currentRole === 'buyer') {
       query = query.eq('buyer_id', userId)
+    } else if (currentRole === 'seller') {
+      query = query.eq('seller_id', userId)
     }
 
     const { data: loads, error: loadError } = await query
@@ -654,159 +656,159 @@ const Orders = () => {
         )}
       </div>
 
-        <div className="search-filter-sort-wrapper">
-          {/* Search Box */}
-          <div className="search-box-container">
-            <input
-              type="text"
-              placeholder="Search orders..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="search-input-v3"
-            />
-            <span className="search-icon-v3" style={{ display: 'flex', alignItems: 'center' }}><Search size={14} /></span>
-          </div>
+      <div className="search-filter-sort-wrapper">
+        {/* Search Box */}
+        <div className="search-box-container">
+          <input
+            type="text"
+            placeholder="Search orders..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="search-input-v3"
+          />
+          <span className="search-icon-v3" style={{ display: 'flex', alignItems: 'center' }}><Search size={14} /></span>
+        </div>
 
-          {/* Sort Trigger Button & Popover */}
-          <div style={{ position: 'relative' }} ref={sortRef}>
-            <button
-              className={`sort-trigger-btn ${sortBy !== 'customer' || sortOrder !== 'asc' ? 'active' : ''}`}
-              onClick={() => {
-                setIsSortOpen(!isSortOpen);
-                setIsFilterOpen(false);
-              }}
-            >
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><ArrowUpDown size={14} /> Sort</span>
-            </button>
+        {/* Sort Trigger Button & Popover */}
+        <div style={{ position: 'relative' }} ref={sortRef}>
+          <button
+            className={`sort-trigger-btn ${sortBy !== 'customer' || sortOrder !== 'asc' ? 'active' : ''}`}
+            onClick={() => {
+              setIsSortOpen(!isSortOpen);
+              setIsFilterOpen(false);
+            }}
+          >
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><ArrowUpDown size={14} /> Sort</span>
+          </button>
 
-            {isSortOpen && (
-              <div className="custom-popover-card">
-                <div className="popover-header-v3">
-                  <h4>Sort Options</h4>
-                  <button className="clear-btn" onClick={() => { setSortBy('customer'); setSortOrder('asc'); }}>Reset</button>
+          {isSortOpen && (
+            <div className="custom-popover-card">
+              <div className="popover-header-v3">
+                <h4>Sort Options</h4>
+                <button className="clear-btn" onClick={() => { setSortBy('customer'); setSortOrder('asc'); }}>Reset</button>
+              </div>
+              <div className="popover-body-v3">
+                <div className="popover-field-v3">
+                  <label>Sort By</label>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="popover-input-v3"
+                  >
+                    <option value="customer">Customer</option>
+                    <option value="load_id">Order ID</option>
+                    <option value="pickup">Pickup</option>
+                    <option value="drop">Drop</option>
+                    <option value="eta">ETA</option>
+                    <option value="status">Status</option>
+                  </select>
                 </div>
-                <div className="popover-body-v3">
-                  <div className="popover-field-v3">
-                    <label>Sort By</label>
-                    <select
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value)}
-                      className="popover-input-v3"
+                <div className="popover-field-v3">
+                  <label>Direction</label>
+                  <div className="popover-btn-group">
+                    <button
+                      style={{
+                        padding: '8px',
+                        borderRadius: '8px',
+                        border: sortOrder === 'asc' ? '1px solid var(--accent)' : '1px solid var(--border-input)',
+                        background: sortOrder === 'asc' ? 'var(--accent-bg)' : 'transparent',
+                        color: sortOrder === 'asc' ? 'var(--accent)' : 'var(--text-primary)',
+                        cursor: 'pointer',
+                        fontWeight: 'bold'
+                      }}
+                      onClick={() => setSortOrder('asc')}
                     >
-                      <option value="customer">Customer</option>
-                      <option value="load_id">Order ID</option>
-                      <option value="pickup">Pickup</option>
-                      <option value="drop">Drop</option>
-                      <option value="eta">ETA</option>
-                      <option value="status">Status</option>
-                    </select>
-                  </div>
-                  <div className="popover-field-v3">
-                    <label>Direction</label>
-                    <div className="popover-btn-group">
-                      <button
-                        style={{
-                          padding: '8px',
-                          borderRadius: '8px',
-                          border: sortOrder === 'asc' ? '1px solid var(--accent)' : '1px solid var(--border-input)',
-                          background: sortOrder === 'asc' ? 'var(--accent-bg)' : 'transparent',
-                          color: sortOrder === 'asc' ? 'var(--accent)' : 'var(--text-primary)',
-                          cursor: 'pointer',
-                          fontWeight: 'bold'
-                        }}
-                        onClick={() => setSortOrder('asc')}
-                      >
-                        Ascending (▲)
-                      </button>
-                      <button
-                        style={{
-                          padding: '8px',
-                          borderRadius: '8px',
-                          border: sortOrder === 'desc' ? '1px solid var(--accent)' : '1px solid var(--border-input)',
-                          background: sortOrder === 'desc' ? 'var(--accent-bg)' : 'transparent',
-                          color: sortOrder === 'desc' ? 'var(--accent)' : 'var(--text-primary)',
-                          cursor: 'pointer',
-                          fontWeight: 'bold'
-                        }}
-                        onClick={() => setSortOrder('desc')}
-                      >
-                        Descending (▼)
-                      </button>
-                    </div>
+                      Ascending (▲)
+                    </button>
+                    <button
+                      style={{
+                        padding: '8px',
+                        borderRadius: '8px',
+                        border: sortOrder === 'desc' ? '1px solid var(--accent)' : '1px solid var(--border-input)',
+                        background: sortOrder === 'desc' ? 'var(--accent-bg)' : 'transparent',
+                        color: sortOrder === 'desc' ? 'var(--accent)' : 'var(--text-primary)',
+                        cursor: 'pointer',
+                        fontWeight: 'bold'
+                      }}
+                      onClick={() => setSortOrder('desc')}
+                    >
+                      Descending (▼)
+                    </button>
                   </div>
                 </div>
               </div>
-            )}
-          </div>
-
-          {/* Filter Trigger Button & Popover */}
-          <div style={{ position: 'relative' }} ref={filterRef}>
-            <button
-              className={`filter-trigger-btn ${activeFilterCount > 0 ? 'active' : ''}`}
-              onClick={() => {
-                setIsFilterOpen(!isFilterOpen);
-                setIsSortOpen(false);
-              }}
-            >
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Filter size={14} /> Filter</span>
-              {activeFilterCount > 0 && <span className="filter-badge-v3">{activeFilterCount}</span>}
-            </button>
-
-            {isFilterOpen && (
-              <div className="custom-popover-card">
-                <div className="popover-header-v3">
-                  <h4>Filter Options</h4>
-                  <button className="clear-btn" onClick={() => { setStatusFilter('all'); setDriverFilter('all'); }}>Clear</button>
-                </div>
-                <div className="popover-body-v3">
-                  <div className="popover-field-v3">
-                    <label>Order Status</label>
-                    <select
-                      value={statusFilter}
-                      onChange={(e) => setStatusFilter(e.target.value)}
-                      className="popover-input-v3"
-                    >
-                      <option value="all">All Statuses</option>
-                      {uniqueStatuses.map(status => (
-                        <option key={status} value={status}>{status}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="popover-field-v3">
-                    <label>Driver Assignment</label>
-                    <select
-                      value={driverFilter}
-                      onChange={(e) => setDriverFilter(e.target.value)}
-                      className="popover-input-v3"
-                    >
-                      <option value="all">All Assignments</option>
-                      <option value="assigned">Driver Assigned</option>
-                      <option value="unassigned">No Driver</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {hasActiveFilters && (
-            <button
-              onClick={handleResetAll}
-              style={{
-                background: 'transparent',
-                border: '1px dashed var(--border-color)',
-                color: 'var(--text-secondary)',
-                padding: '10px 14px',
-                borderRadius: '12px',
-                fontSize: '0.9rem',
-                fontWeight: '600',
-                cursor: 'pointer'
-              }}
-            >
-              Clear All
-            </button>
+            </div>
           )}
         </div>
+
+        {/* Filter Trigger Button & Popover */}
+        <div style={{ position: 'relative' }} ref={filterRef}>
+          <button
+            className={`filter-trigger-btn ${activeFilterCount > 0 ? 'active' : ''}`}
+            onClick={() => {
+              setIsFilterOpen(!isFilterOpen);
+              setIsSortOpen(false);
+            }}
+          >
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Filter size={14} /> Filter</span>
+            {activeFilterCount > 0 && <span className="filter-badge-v3">{activeFilterCount}</span>}
+          </button>
+
+          {isFilterOpen && (
+            <div className="custom-popover-card">
+              <div className="popover-header-v3">
+                <h4>Filter Options</h4>
+                <button className="clear-btn" onClick={() => { setStatusFilter('all'); setDriverFilter('all'); }}>Clear</button>
+              </div>
+              <div className="popover-body-v3">
+                <div className="popover-field-v3">
+                  <label>Order Status</label>
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="popover-input-v3"
+                  >
+                    <option value="all">All Statuses</option>
+                    {uniqueStatuses.map(status => (
+                      <option key={status} value={status}>{status}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="popover-field-v3">
+                  <label>Driver Assignment</label>
+                  <select
+                    value={driverFilter}
+                    onChange={(e) => setDriverFilter(e.target.value)}
+                    className="popover-input-v3"
+                  >
+                    <option value="all">All Assignments</option>
+                    <option value="assigned">Driver Assigned</option>
+                    <option value="unassigned">No Driver</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {hasActiveFilters && (
+          <button
+            onClick={handleResetAll}
+            style={{
+              background: 'transparent',
+              border: '1px dashed var(--border-color)',
+              color: 'var(--text-secondary)',
+              padding: '10px 14px',
+              borderRadius: '12px',
+              fontSize: '0.9rem',
+              fontWeight: '600',
+              cursor: 'pointer'
+            }}
+          >
+            Clear All
+          </button>
+        )}
+      </div>
 
       {fetchError && (
         <EmptyState
@@ -856,11 +858,11 @@ const Orders = () => {
           {sortedCards.map((load) => {
             const isExpanded = expandedCards.has(load.load_id);
             const isFleet = load.load_id?.startsWith('FLEET-');
-            
+
             // Get city names
             const pickupCity = getCityFromLocation(load.pickup);
             const dropCity = getCityFromLocation(load.drop);
-            
+
             // Status mapping for visual badge
             let statusConfig = { bg: '#fff7ed', text: '#f97316', label: load.status || 'Pending', dot: '#f97316' };
             const lowerStatus = (load.status || '').toLowerCase();
@@ -884,7 +886,7 @@ const Orders = () => {
                 ? { bg: '#fee2e2', text: '#ef4444', label: 'Not Confirmed', dot: '#ef4444' }
                 : { bg: '#dcfce7', text: '#16a34a', label: 'Confirmed', dot: '#16a34a' };
             }
-            
+
             // Generate contextual AI insights
             let aiInsight = "Route monitored by active systems.";
             if (isUnpaid && (lowerStatus === 'pending' || lowerStatus === 'not confirmed' || lowerStatus === 'confirmed')) {
@@ -924,11 +926,11 @@ const Orders = () => {
                   top: 0,
                   bottom: 0,
                   width: '5px',
-                  background: lowerStatus === 'running' || lowerStatus === 'assigned' || lowerStatus === 'in transit' 
-                    ? 'linear-gradient(180deg, #f97316, #ea580c)' 
+                  background: lowerStatus === 'running' || lowerStatus === 'assigned' || lowerStatus === 'in transit'
+                    ? 'linear-gradient(180deg, #f97316, #ea580c)'
                     : lowerStatus === 'delivered' || lowerStatus === 'confirmed'
-                    ? 'linear-gradient(180deg, #10b981, #059669)'
-                    : 'linear-gradient(180deg, #cbd5e1, #94a3b8)'
+                      ? 'linear-gradient(180deg, #10b981, #059669)'
+                      : 'linear-gradient(180deg, #cbd5e1, #94a3b8)'
                 }} />
 
                 {/* Card Header */}
@@ -954,7 +956,7 @@ const Orders = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Status Badge */}
                   <span style={{
                     background: statusConfig.bg,
@@ -1048,7 +1050,7 @@ const Orders = () => {
                       {userRole === 'driver' ? 'EARNING' : 'VALUE'}
                     </span>
                     <span style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-primary, #1e293b)' }}>
-                      {userRole === 'driver' 
+                      {userRole === 'driver'
                         ? (load.assigned_amount ? `₹${Number(load.assigned_amount).toLocaleString("en-IN")}` : 'Not Set')
                         : (load.buyer_amount ? `₹${Number(load.buyer_amount).toLocaleString("en-IN")}` : 'Not Set')
                       }
@@ -1362,7 +1364,7 @@ const Orders = () => {
                   <input type="text" readOnly required value={customer} style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', border: '1px solid #cbd5e1', outline: 'none', background: '#f1f5f9', cursor: 'not-allowed' }} placeholder="Select a Buyer below..." />
                 </div>
               </div>
- 
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div ref={pickupDropdownRef} style={{ position: 'relative' }}>
                   <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: '#64748b', marginBottom: '6px' }}>Pickup Location</label>
@@ -1563,13 +1565,13 @@ const Orders = () => {
                     {routingLoading ? 'Calculating...' : 'Calculate Route'}
                   </button>
                 </div>
-                
+
                 {routingError && (
                   <div style={{ fontSize: '0.8rem', color: '#ef4444', fontWeight: 600 }}>
                     ⚠ {routingError}
                   </div>
                 )}
-                
+
                 {routingData && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     {/* Terrain badge + ETA headline */}
@@ -1645,7 +1647,7 @@ const Orders = () => {
                   </div>
                 )}
               </div>
- 
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
                   <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: '#64748b', marginBottom: '6px' }}>
@@ -1662,7 +1664,7 @@ const Orders = () => {
                   <input type="number" value={buyerAmount} onChange={e => setBuyerAmount(e.target.value)} style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', border: '1px solid #cbd5e1', outline: 'none' }} placeholder="30000" />
                 </div>
               </div>
- 
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: '#64748b', marginBottom: '6px' }}>Buyer</label>
@@ -1694,7 +1696,7 @@ const Orders = () => {
                   </select>
                 </div>
               </div>
- 
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: '#64748b', marginBottom: '6px' }}>Fleet Vehicle (Active Only)</label>
@@ -1729,7 +1731,7 @@ const Orders = () => {
                   />
                 </div>
               </div>
- 
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: '#64748b', marginBottom: '6px' }}>Order Status</label>
@@ -1801,7 +1803,7 @@ const Orders = () => {
                   <input type="text" readOnly required value={editCustomer} style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', border: '1px solid #cbd5e1', outline: 'none', background: '#f1f5f9', cursor: 'not-allowed' }} placeholder="Select a Buyer below..." />
                 </div>
               </div>
- 
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div ref={editPickupDropdownRef} style={{ position: 'relative' }}>
                   <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: '#64748b', marginBottom: '6px' }}>Pickup Location</label>
@@ -2002,13 +2004,13 @@ const Orders = () => {
                     {editRoutingLoading ? 'Calculating...' : 'Calculate Route'}
                   </button>
                 </div>
-                
+
                 {editRoutingError && (
                   <div style={{ fontSize: '0.8rem', color: '#ef4444', fontWeight: 600 }}>
                     ⚠ {editRoutingError}
                   </div>
                 )}
-                
+
                 {editRoutingData && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     {/* Terrain badge + ETA headline */}
@@ -2101,7 +2103,7 @@ const Orders = () => {
                   <input type="number" value={editBuyerAmount} onChange={e => setEditBuyerAmount(e.target.value)} style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', border: '1px solid #cbd5e1', outline: 'none' }} placeholder="30000" />
                 </div>
               </div>
- 
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: '#64748b', marginBottom: '6px' }}>Buyer</label>
@@ -2113,7 +2115,7 @@ const Orders = () => {
                       setEditBuyerId(selectedId);
                       const buyerObj = buyersList.find(b => b.id === selectedId);
                       setEditCustomer(buyerObj ? buyerObj.full_name : '');
-                      
+
                       if (!selectedId) { setEditBuyerDestinations([]); return; }
                       try {
                         const res = await fetch(`${API_BASE}/api/buyer-warehouses?buyer_id=${selectedId}`)
@@ -2156,7 +2158,7 @@ const Orders = () => {
                   </select>
                 </div>
               </div>
- 
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: '#64748b', marginBottom: '6px' }}>Fleet Vehicle (Active Only)</label>
@@ -2191,7 +2193,7 @@ const Orders = () => {
                   />
                 </div>
               </div>
- 
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: '#64748b', marginBottom: '6px' }}>Order Status</label>

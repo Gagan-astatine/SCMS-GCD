@@ -26,10 +26,10 @@ const allowedOrigins = [
 const corsOptions = {
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
-    const isAllowed = allowedOrigins.includes(origin) || 
-                      origin.endsWith(".vercel.app") || 
-                      origin.endsWith(".web.app") || 
-                      origin.endsWith(".firebaseapp.com");
+    const isAllowed = allowedOrigins.includes(origin) ||
+      origin.endsWith(".vercel.app") ||
+      origin.endsWith(".web.app") ||
+      origin.endsWith(".firebaseapp.com");
     if (isAllowed) {
       callback(null, true);
     } else {
@@ -61,7 +61,7 @@ app.post("/api/ai/chat", async (req, res) => {
     try {
       const geminiKey = process.env.GEMINI_API_KEY || "AIzaSyBwuLymlOnQKa6fDuQ6J8xNldCAzep8J1w";
       const genAI = new GoogleGenerativeAI(geminiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite-preview" });
 
       const result = await model.generateContent(prompt);
       const text = result.response.text();
@@ -127,7 +127,7 @@ app.post("/api/ai/chat", async (req, res) => {
           let pctThreshold = 85; // default
           const pctMatch = query.match(/(\d+)\s*%/);
           const numMatch = query.match(/above\s+(\d+)/) || query.match(/exceeding\s+(\d+)/) || query.match(/over\s+(\d+)/);
-          
+
           if (pctMatch) {
             pctThreshold = parseInt(pctMatch[1]);
           } else if (numMatch) {
@@ -167,8 +167,8 @@ app.post("/api/ai/chat", async (req, res) => {
           }
 
           if (filterCity) {
-            warehouses = warehouses.filter(w => 
-              (w.city && w.city.toLowerCase().includes(filterCity)) || 
+            warehouses = warehouses.filter(w =>
+              (w.city && w.city.toLowerCase().includes(filterCity)) ||
               (w.name && w.name.toLowerCase().includes(filterCity)) ||
               (w.address && w.address.toLowerCase().includes(filterCity))
             );
@@ -180,7 +180,7 @@ app.post("/api/ai/chat", async (req, res) => {
               : `There are **${warehouses.length}** warehouses total in the database.`;
           } else {
             if (warehouses.length === 0) {
-              responseText = filterCity 
+              responseText = filterCity
                 ? `I couldn't find any warehouses in ${filterCity.toUpperCase()} registered under your profile.`
                 : "I couldn't find any warehouses registered under your profile.";
             } else {
@@ -202,7 +202,7 @@ app.post("/api/ai/chat", async (req, res) => {
       else if (isDriver) {
         const drivers = contextData.drivers || [];
         const activeDrivers = drivers.filter(d => (d.status || '').toLowerCase() === 'active');
-        
+
         if (query.includes("how many") || query.includes("count") || query.includes("number") || query.includes("summary")) {
           responseText = `There are **${drivers.length}** total drivers registered. Currently, **${activeDrivers.length}** are active/available.`;
         } else {
@@ -221,7 +221,7 @@ app.post("/api/ai/chat", async (req, res) => {
       // 3. Orders Queries
       else if (isOrder) {
         let orders = contextData.orders || contextData.recentOrders || [];
-        
+
         if (query.includes("how many") || query.includes("count") || query.includes("number")) {
           if (query.includes("pending")) {
             const pending = orders.filter(o => (o.status || '').toLowerCase() === 'pending').length;
@@ -270,10 +270,10 @@ app.post("/api/ai/chat", async (req, res) => {
         const orders = contextData.orders || [];
         const fleet = contextData.fleet || [];
         responseText = `**Today's Operations Summary**:\n\n` +
-                       `- **Active Warehouses**: ${warehouses.length}\n` +
-                       `- **Total Orders**: ${orders.length}\n` +
-                       `- **Fleet Size**: ${fleet.length}\n\n` +
-                       `Everything is running smoothly!`;
+          `- **Active Warehouses**: ${warehouses.length}\n` +
+          `- **Total Orders**: ${orders.length}\n` +
+          `- **Fleet Size**: ${fleet.length}\n\n` +
+          `Everything is running smoothly!`;
       }
       // 5. Fleet / Trucks Queries
       else if (isFleet) {
@@ -293,7 +293,7 @@ app.post("/api/ai/chat", async (req, res) => {
       // 6. Generic Fallback
       else {
         responseText = "I am operating in Offline/Fallback mode because the server's Gemini API Key has been flagged as leaked.\n\n" +
-                       "You can ask about your **orders**, **warehouses**, **drivers**, or **fleet status**, and I will fetch them directly from the database context!";
+          "You can ask about your **orders**, **warehouses**, **drivers**, or **fleet status**, and I will fetch them directly from the database context!";
       }
 
       return res.json({ text: responseText });
